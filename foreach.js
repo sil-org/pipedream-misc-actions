@@ -4,7 +4,7 @@ export default defineComponent({
   name: "Foreach",
   description: "Runs a sub-workflow for each value of an array",
   key: "foreach",
-  version: "0.0.1",
+  version: "0.0.2",
   type: "action",
 
   props: {
@@ -20,12 +20,15 @@ export default defineComponent({
     }
   },
   async run({ steps, $ }) {
+    const results = [];
     for await(const record of this.records) {
-      await axios($, {
+      const resp = await axios($, {
         url: this.workflow_url,
         method: 'POST',
         data: record
       })
+      results.push(resp.data)
     }
+    return results
   },
 })
