@@ -1,7 +1,7 @@
 export default defineComponent({
-  name: "Paginated Request",
+  name: "Paginated HTTP Request",
   description: "Creates a HTTP Request until end of paginated data or timeout is reached",
-  key: "paginated_request",
+  key: "paginated_http_request",
   version: "0.0.1",
   type: "action",
 
