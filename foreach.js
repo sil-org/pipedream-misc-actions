@@ -4,7 +4,7 @@ export default defineComponent({
   name: "Foreach",
   description: "Runs a sub-workflow for each value of an array",
   key: "foreach",
-  version: "0.0.5",
+  version: "0.0.6",
   type: "action",
 
   props: {
@@ -34,7 +34,7 @@ export default defineComponent({
         data: record,
         headers: {Authorization: `Bearer ${this.api_token}`}
       })
-      results.push(resp.data)
+      results.push(resp)
     }
     return results
   },
