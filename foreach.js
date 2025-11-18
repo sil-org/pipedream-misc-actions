@@ -22,6 +22,7 @@ export default defineComponent({
       type: "string",
       label: "API Bearer token",
       description: "Will be added as a Bearer token in the Authorization header in calls to the workflow URL"
+    }
   },
   async run({ steps, $ }) {
     const results = [];
