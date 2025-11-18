@@ -4,7 +4,7 @@ export default defineComponent({
   name: "Foreach",
   description: "Runs a sub-workflow for each value of an array",
   key: "foreach",
-  version: "0.0.2",
+  version: "0.0.3",
   type: "action",
 
   props: {
