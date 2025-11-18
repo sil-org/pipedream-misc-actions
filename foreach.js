@@ -17,7 +17,11 @@ export default defineComponent({
       type: "string",
       label: "Processing workflow URL",
       description: "The HTTP endpoint to connect to that's processing single individual records from this workflow"
-    }
+    },
+    api_token: {
+      type: "string",
+      label: "API Bearer token",
+      description: "Will be added as a Bearer token in the Authorization header in calls to the workflow URL"
   },
   async run({ steps, $ }) {
     const results = [];
@@ -25,7 +29,8 @@ export default defineComponent({
       const resp = await axios($, {
         url: this.workflow_url,
         method: 'POST',
-        data: record
+        data: record,
+        headers: {Authorization: `Bearer ${this.api_token}`}
       })
       results.push(resp.data)
     }
