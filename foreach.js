@@ -4,7 +4,7 @@ export default defineComponent({
   name: "Foreach",
   description: "Runs a sub-workflow for each value of an array",
   key: "foreach",
-  version: "0.0.3",
+  version: "0.0.4",
   type: "action",
 
   props: {
@@ -21,7 +21,8 @@ export default defineComponent({
     api_token: {
       type: "string",
       label: "API Bearer token",
-      description: "Will be added as a Bearer token in the Authorization header in calls to the workflow URL"
+      description: "Will be added as a Bearer token in the Authorization header in calls to the workflow URL",
+      secret: true
     }
   },
   async run({ steps, $ }) {
