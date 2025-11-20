@@ -46,7 +46,7 @@ export default defineComponent({
     }
   },
   methods: {
-    get_pagination_index() {
+    getPaginationIndex() {
       let i = this.http_request.params.findIndex(p => p.name == this.paginator)
       if (i < 0) {
         i = this.http_request.params.length
@@ -57,14 +57,14 @@ export default defineComponent({
       }
       return i
     },
-    get_response_data(resp) {
+    getResponseData(resp) {
       let data = resp
       for (const field of this.data_field.split(".")) {
         data = data[field]
       }
       return data
     },
-    handle_timeout(start) {
+    handleTimeout(start) {
       const duration = Date.now() - start
       if (this.timeout && duration > this.timeout * 1000) {
         const msg = `Timeout reached at ${duration / 1000} seconds`
@@ -78,14 +78,14 @@ export default defineComponent({
     }
   },
   async run({ $ }) {
-    const i = await this.get_pagination_index()
+    const i = await this.getPaginationIndex()
     const start = Date.now()
     const results = []
     let data = []
     let count = 1
     do {
       const resp = await this.http_request.execute()
-      data = await this.get_response_data(resp)
+      data = await this.getResponseData(resp)
 
       if (!Array.isArray(data)) {
         throw new Error(`Response data is not an array: ${typeof data}`);
@@ -97,7 +97,7 @@ export default defineComponent({
 
       results.push(...data)
 
-      if (await this.handle_timeout(start)) {
+      if (await this.handleTimeout(start)) {
         break
       }
       count++
