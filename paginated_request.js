@@ -2,7 +2,7 @@ export default defineComponent({
   name: "Paginated HTTP Request",
   description: "Creates a HTTP Request until end of paginated data or timeout is reached",
   key: "paginated_http_request",
-  version: "0.0.1",
+  version: "0.0.2",
   type: "action",
 
   props: {
@@ -47,12 +47,15 @@ export default defineComponent({
   },
   methods: {
     get_pagination_index() {
-      for (const key in this.http_request.params) {
-        if (this.http_request.params[key].name == this.paginator) {
-          return key
-        }
+      let i = this.http_request.params.findIndex(p => p.name == this.paginator)
+      if (i < 0) {
+        i = this.http_request.params.length
+        this.http_request.params.push({
+          "name": this.paginator,
+          "value": "0"
+        })
       }
-      return null
+      return i
     },
     get_response_data(resp) {
       let data = resp
@@ -76,10 +79,6 @@ export default defineComponent({
   },
   async run({ $ }) {
     const i = await this.get_pagination_index()
-    if (i === null) {
-      throw new Error("Pagination parameter not set")
-    }
-
     const start = Date.now()
     const results = []
     let data = []
