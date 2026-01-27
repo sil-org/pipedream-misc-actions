@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "alasql": "^4.17.0",
+    "papaparse": "^5.5.3"
+  }
+}
