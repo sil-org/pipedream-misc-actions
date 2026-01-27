@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --loader ./loader.mjs --test"
   },
   "dependencies": {
     "alasql": "^4.17.0",
