@@ -1,5 +1,5 @@
-import alasql from 'alasql'
-import Papa from 'papaparse'
+import alasql from 'alasql@^4'
+import Papa from 'papaparse@^5'
 
 export default defineComponent({
   name: "SQL Query CSV",
