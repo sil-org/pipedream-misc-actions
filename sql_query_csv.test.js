@@ -5,13 +5,13 @@ globalThis.defineComponent = (config) => config
 
 const { default: component } = await import('./sql_query_csv.js')
 
-const csvContent = `Title,Genre,Author
+const validCsvContent = `Title,Genre,Author
 "The Hobbit",Fantasy,"J.R.R. Tolkien"
 "Pride and Prejudice",Fiction,"Jane Austen"`
 
 describe('SQL Query CSV', () => {
   it('should retrieve the specified CSV row data', async () => {
-    component.csv_content = csvContent
+    component.csv_content = validCsvContent
     component.csv_has_header = true
     component.sql_query = 'SELECT Title FROM ? WHERE Genre = "Fiction"'
 
