@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "test": "node --loader ./loader.mjs --test"
+    "test": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test"
   },
   "dependencies": {
     "alasql": "^4.17.0",
