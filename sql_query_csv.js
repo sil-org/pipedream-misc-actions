@@ -34,6 +34,13 @@ export default defineComponent({
         skipEmptyLines: true,
       }
     )
+
+    if (csvParseResults.errors?.length > 0) {
+      return {
+        errors: csvParseResults.errors,
+      }
+    }
+
     const rows = alasql(
       this.sql_query,
       [csvParseResults.data]
