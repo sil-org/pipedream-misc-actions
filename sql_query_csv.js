@@ -5,7 +5,7 @@ export default defineComponent({
   name: "SQL Query CSV",
   description: "Use a SQL query to get data from CSV data",
   key: "sql_query_csv",
-  version: "0.0.1",
+  version: "0.0.2",
   type: "action",
 
   props: {
@@ -34,6 +34,13 @@ export default defineComponent({
         skipEmptyLines: true,
       }
     )
+
+    if (csvParseResults.errors?.length > 0) {
+      return {
+        errors: csvParseResults.errors,
+      }
+    }
+
     const rows = alasql(
       this.sql_query,
       [csvParseResults.data]
