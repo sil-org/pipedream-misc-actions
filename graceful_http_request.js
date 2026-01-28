@@ -1,4 +1,4 @@
-export default defineComponent({
+export default {
   name: "Graceful HTTP Request",
   description: "Creates a HTTP Request with graceful error handling",
   key: "graceful_http_request",
@@ -33,4 +33,4 @@ export default defineComponent({
 
     return {errors}
   }
-})
+}
