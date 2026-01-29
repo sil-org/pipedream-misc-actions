@@ -1,7 +1,8 @@
 import Client from 'ssh2-sftp-client@^12.0.1'
 
 /**
- * Walks a directory on the remote SFTP server and returns a list of files.
+ * Walks a directory on the remote SFTP server and returns a list of files. Returns an object with filenames as keys
+ * and content as values.
  *
  * @param {Client} sftp
  * @param {string} remotePath
@@ -23,11 +24,12 @@ async function walkDir(sftp, remotePath, files = {}) {
 }
 
 export default {
-  name: "Download SFTP Files",
-  description: "Downloads all files from a directory on an SFTP host.",
-  key: "sftp_download_files",
-  version: "0.0.1",
-  type: "action",
+  name: 'Download SFTP Files',
+  description: 'Downloads all files from a directory on an SFTP host. Returns an object with filenames ' +
+    'as keys and content as values.',
+  key: 'sftp_download_files',
+  version: '0.0.1',
+  type: 'action',
 
   props: {
     sftp: {
@@ -73,7 +75,7 @@ export default {
 
     const fileCount = Object.keys(files).length
     const summary = fileCount > 0 ? `Successfully downloaded ${fileCount} files.` : `No files found.`
-    $.export("$summary", summary)
+    $.export('$summary', summary)
 
     return {
       files,
