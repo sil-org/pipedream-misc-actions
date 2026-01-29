@@ -71,10 +71,9 @@ export default {
 
     await sftp.end()
 
-    $.export(
-      "$summary",
-      `Successfully downloaded ${files.length} files.`
-    );
+    const fileCount = Object.keys(files).length
+    const summary = fileCount > 0 ? `Successfully downloaded ${fileCount} files.` : `No files found.`
+    $.export("$summary", summary)
 
     return {
       files,
