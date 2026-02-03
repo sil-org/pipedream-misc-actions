@@ -20,6 +20,20 @@ export default defineComponent({
       description: "Whether the CSV data has a header row. If so, the data rows' data will be keyed on field names instead of indexes.",
       default: true,
     },
+    csv_content_2: {
+      type: "string",
+      label: "CSV content (2nd)",
+      description: "A 2nd CSV content (string) for the SQL query, such as for JOINs",
+      optional: true,
+      default: "",
+    },
+    csv_2_has_header: {
+      type: "boolean",
+      label: "CSV 2 has header row?",
+      description: "Whether the 2nd CSV data has a header row.",
+      optional: true,
+      default: true,
+    },
     sql_query: {
       type: "string",
       label: "SQL query",
@@ -27,6 +41,8 @@ export default defineComponent({
     },
   },
   async run({ steps, $ }) {
+    let csvDataForQuery = []
+
     const csvParseResults = Papa.parse(
       this.csv_content,
       {
@@ -40,10 +56,28 @@ export default defineComponent({
         errors: csvParseResults.errors,
       }
     }
+    csvDataForQuery.push(csvParseResults.data)
+
+    if (this.csv_content_2) {
+      const csv2ParseResults = Papa.parse(
+        this.csv_content_2,
+        {
+          header: this.csv_2_has_header,
+          skipEmptyLines: true,
+        }
+      )
+
+      if (csv2ParseResults.errors?.length > 0) {
+        return {
+          errors: csv2ParseResults.errors,
+        }
+      }
+      csvDataForQuery.push(csv2ParseResults.data)
+    }
 
     const rows = alasql(
       this.sql_query,
-      [csvParseResults.data]
+      csvDataForQuery
     )
     return { rows }
   },
