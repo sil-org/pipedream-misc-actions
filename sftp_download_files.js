@@ -35,6 +35,8 @@ export default {
     sftp: {
       type: 'app',
       app: 'sftp',
+      label: 'SFTP Account app',
+      description: 'SFTP Account connection app established in Pipedream Accounts tab',
     },
     directory: {
       type: 'string',
