@@ -23,7 +23,7 @@ export default defineComponent({
     csv_content_2: {
       type: "string",
       label: "CSV content (2nd)",
-      description: "A 2nd CSV content (string) for the SQL query, such as for JOINs",
+      description: "A 2nd CSV content (string) for the SQL query for JOINs",
       optional: true,
       default: "",
     },
