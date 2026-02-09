@@ -5,7 +5,7 @@ globalThis.defineComponent = (config) => config
 
 const { default: component } = await import('./sql_query_data.js')
 
-describe('SQL Query Data', () => {
+describe(component.name, () => {
   it('should retrieve the specified row of data', async () => {
     component.data_inputs = [
       {
