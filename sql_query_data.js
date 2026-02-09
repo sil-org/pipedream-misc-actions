@@ -4,14 +4,14 @@ export default {
   name: "SQL Query Data",
   description: "Use a SQL query to get data from the given sets of data",
   key: "sql_query_data",
-  version: "0.1.0",
+  version: "0.1.1",
   type: "action",
 
   props: {
     data_inputs: {
-      type: "any[]",
+      type: "any",
       label: "Data inputs",
-      description: "The data to use in the SQL Query (one for each `?` in query)"
+      description: "An array of data inputs to use in the SQL Query (one for each `?` in query)"
     },
     sql_query: {
       type: "string",
