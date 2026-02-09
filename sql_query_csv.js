@@ -5,74 +5,45 @@ export default defineComponent({
   name: "SQL Query CSV",
   description: "Use a SQL query to get data from CSV data",
   key: "sql_query_csv",
-  version: "0.0.3",
+  version: "0.1.0",
   type: "action",
 
   props: {
-    csv_content: {
-      type: "string",
-      label: "CSV content",
-      description: "The CSV content (string) to run the SQL query against"
+    csv_inputs: {
+      type: "[]string",
+      label: "CSV inputs",
+      description: "The CSV data to use in the SQL Query (one for each `?` in query)"
     },
-    csv_has_header: {
-      type: "boolean",
-      label: "CSV has header row?",
-      description: "Whether the CSV data has a header row. If so, the data rows' data will be keyed on field names instead of indexes.",
-      default: true,
-    },
-    csv_content_2: {
-      type: "string",
-      label: "CSV content (2nd)",
-      description: "A 2nd CSV content (string) for the SQL query for JOINs",
-      optional: true,
-      default: "",
-    },
-    csv_2_has_header: {
-      type: "boolean",
-      label: "CSV 2 has header row?",
-      description: "Whether the 2nd CSV data has a header row.",
-      optional: true,
+    csv_inputs_have_header: {
+      type: "[]boolean",
+      label: "CSV inputs have header row?",
+      description: "Whether the CSV data inputs have header rows (one boolean per CSV input). If so, the data rows' data will be keyed on field names instead of indexes.",
       default: true,
     },
     sql_query: {
       type: "string",
       label: "SQL query",
-      description: "The SQL query to run against the provided CSV data. Use a question mark (?) for the table name.",
+      description: "The SQL query to run against the provided CSV data. Use a question mark (?) for where you want to use each CSV input (e.g as the table name), in order.",
     },
   },
   async run({ steps, $ }) {
     let csvDataForQuery = []
 
-    const csvParseResults = Papa.parse(
-      this.csv_content,
-      {
-        header: this.csv_has_header,
-        skipEmptyLines: true,
-      }
-    )
-
-    if (csvParseResults.errors?.length > 0) {
-      return {
-        errors: csvParseResults.errors,
-      }
-    }
-    csvDataForQuery.push(csvParseResults.data)
-
-    if (this.csv_content_2) {
-      const csv2ParseResults = Papa.parse(
-        this.csv_content_2,
+    for (let i = 0; i < this.csv_inputs.length; i++) {
+      const csvParseResults = Papa.parse(
+        this.csv_inputs[i],
         {
-          header: this.csv_2_has_header,
+          header: this.csv_inputs_have_header[i],
           skipEmptyLines: true,
         }
       )
 
-      if (csv2ParseResults.errors?.length > 0) {
+      if (csvParseResults.errors?.length > 0) {
         return {
-          errors: csv2ParseResults.errors,
+          errors: csvParseResults.errors,
         }
       }
-      csvDataForQuery.push(csv2ParseResults.data)
+      csvDataForQuery.push(csvParseResults.data)
     }
 
     const rows = alasql(

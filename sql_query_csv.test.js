@@ -18,8 +18,8 @@ const authorsCsvContent = `Name,Born,Died
 
 describe('SQL Query CSV', () => {
   it('should retrieve the specified CSV row data', async () => {
-    component.csv_content = booksCsvContent
-    component.csv_has_header = true
+    component.csv_inputs = [booksCsvContent]
+    component.csv_inputs_have_header = [true]
     component.sql_query = 'SELECT Title FROM ? WHERE Genre = "Fiction"'
 
     const response = await component.run({
@@ -27,21 +27,18 @@ describe('SQL Query CSV', () => {
       $: {}
     })
 
-    assert.deepStrictEqual(
-      response,
-      {
-        "rows": [
-          {
-            "Title": "Pride and Prejudice"
-          }
-        ]
-      }
+    assert.equal(response.errors, undefined)
+    assert.deepEqual(
+      response.rows,
+      [
+        { "Title": "Pride and Prejudice" }
+      ]
     )
   })
 
   it('should handle CSV-parsing errors', async () => {
-    component.csv_content = invalidCsvContent
-    component.csv_has_header = true
+    component.csv_inputs = [invalidCsvContent]
+    component.csv_inputs_have_header = [true]
     component.sql_query = 'SELECT Title FROM ? WHERE Genre = "Fiction"'
 
     const response = await component.run({
@@ -56,10 +53,8 @@ describe('SQL Query CSV', () => {
   })
 
   it('should accept multiple CSVs, such as for a JOIN', async () => {
-    component.csv_content = booksCsvContent
-    component.csv_content_2 = authorsCsvContent
-    component.csv_has_header = true
-    component.csv_2_has_header = true
+    component.csv_inputs = [booksCsvContent, authorsCsvContent]
+    component.csv_inputs_have_header = [true, true]
     component.sql_query = `
       SELECT
         books.Title,
@@ -76,17 +71,12 @@ describe('SQL Query CSV', () => {
       $: {}
     })
 
+    assert.equal(response.errors, undefined)
     assert.deepEqual(
-      response,
-      {
-        "rows": [
-          {
-            Born: "1892",
-            Name: "J.R.R. Tolkien",
-            Title: "The Hobbit",
-          }
-        ]
-      }
+      response.rows,
+      [
+        { Born: "1892", Name: "J.R.R. Tolkien", Title: "The Hobbit" }
+      ]
     )
   })
 })
