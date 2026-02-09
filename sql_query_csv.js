@@ -10,12 +10,12 @@ export default defineComponent({
 
   props: {
     csv_inputs: {
-      type: "[]string",
+      type: "string[]",
       label: "CSV inputs",
       description: "The CSV data to use in the SQL Query (one for each `?` in query)"
     },
     csv_inputs_have_header: {
-      type: "[]boolean",
+      type: "boolean[]",
       label: "CSV inputs have header row?",
       description: "Whether the CSV data inputs have header rows (one boolean per CSV input). If so, the data rows' data will be keyed on field names instead of indexes.",
       default: true,
