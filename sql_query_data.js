@@ -1,7 +1,6 @@
 import alasql from 'alasql@^4'
-import Papa from 'papaparse@^5'
 
-export default defineComponent({
+export default {
   name: "SQL Query Data",
   description: "Use a SQL query to get data from the given sets of data",
   key: "sql_query_data",
@@ -21,29 +20,10 @@ export default defineComponent({
     },
   },
   async run({ steps, $ }) {
-    let csvDataForQuery = []
-
-    for (let i = 0; i < this.csv_inputs.length; i++) {
-      const csvParseResults = Papa.parse(
-        this.csv_inputs[i],
-        {
-          header: this.csv_inputs_have_header[i],
-          skipEmptyLines: true,
-        }
-      )
-
-      if (csvParseResults.errors?.length > 0) {
-        return {
-          errors: csvParseResults.errors,
-        }
-      }
-      csvDataForQuery.push(csvParseResults.data)
-    }
-
     const rows = alasql(
       this.sql_query,
-      csvDataForQuery
+      this.data_inputs,
     )
     return { rows }
   },
-})
+}
