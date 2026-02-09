@@ -9,21 +9,15 @@ export default defineComponent({
   type: "action",
 
   props: {
-    csv_inputs: {
-      type: "string[]",
-      label: "CSV inputs",
-      description: "The CSV data to use in the SQL Query (one for each `?` in query)"
-    },
-    csv_inputs_have_header: {
-      type: "boolean[]",
-      label: "CSV inputs have header row?",
-      description: "Whether the CSV data inputs have header rows (one boolean per CSV input). If so, the data rows' data will be keyed on field names instead of indexes.",
-      default: true,
+    data_inputs: {
+      type: "any[]",
+      label: "Data inputs",
+      description: "The data to use in the SQL Query (one for each `?` in query)"
     },
     sql_query: {
       type: "string",
       label: "SQL query",
-      description: "The SQL query to run against the provided CSV data. Use a question mark (?) for where you want to use each CSV input (e.g as the table name), in order.",
+      description: "The SQL query to run against the provided data. Use a question mark (?) for where you want to use each data input (e.g as the table name), in order.",
     },
   },
   async run({ steps, $ }) {
