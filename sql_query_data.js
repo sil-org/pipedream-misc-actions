@@ -2,9 +2,9 @@ import alasql from 'alasql@^4'
 import Papa from 'papaparse@^5'
 
 export default defineComponent({
-  name: "SQL Query CSV",
-  description: "Use a SQL query to get data from CSV data",
-  key: "sql_query_csv",
+  name: "SQL Query Data",
+  description: "Use a SQL query to get data from the given sets of data",
+  key: "sql_query_data",
   version: "0.1.0",
   type: "action",
 
