@@ -2,7 +2,7 @@ export default {
   name: "Graceful HTTP Request",
   description: "Creates a HTTP Request with graceful error handling",
   key: "graceful_http_request",
-  version: "0.0.1",
+  version: "0.0.2",
   type: "action",
 
   props: {
@@ -17,17 +17,17 @@ export default {
       type: "integer",
       label: "Number of retries on failure",
       optional: true,
-      min: 1,
-      default: 1
+      min: 0,
+      default: 0
     }
   },
   async run({ $ }) {
     const errors = [];
-    for (let i = 0; i < this.retries; i++) {
+    for (let i = 0; i <= this.retries; i++) {
       try {
         return await this.http_request.execute();
       } catch (err) {
-        errors.concat(err.message);
+        errors.push({message: err.message, code: err.response?.status, data: err.response?.data});
       }
     }
 
