@@ -1,4 +1,4 @@
-module.exports = defineComponent({
+export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
@@ -96,4 +96,4 @@ module.exports = defineComponent({
 
     return result
   },
-})
+}
