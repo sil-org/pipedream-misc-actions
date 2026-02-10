@@ -1,7 +1,7 @@
 module.exports = defineComponent({
-  name: "Send Email (Optional Attachment)",
+  name: "Send Email",
   description: "Send an email, with or without an attachment",
-  key: "send_email_optional_attachment",
+  key: "send_email",
   version: "0.1.1",
   type: "action",
 
