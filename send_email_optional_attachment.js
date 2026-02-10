@@ -1,4 +1,10 @@
 module.exports = defineComponent({
+  name: "Send Email (Optional Attachment)",
+  description: "Send an email, with or without an attachment",
+  key: "send_email_optional_attachment",
+  version: "0.1.1",
+  type: "action",
+
   props: {
     amazon_ses: {
       type: "app",
