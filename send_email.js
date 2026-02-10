@@ -1,3 +1,5 @@
+import AWS from 'aws-sdk@^2'
+
 export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
@@ -50,7 +52,6 @@ export default {
     },
   },
   async run({ steps, $ }) {
-    const AWS = require("aws-sdk")
     const { accessKeyId, secretAccessKey } = this.amazon_ses.$auth
 
     const ses = new AWS.SES({
