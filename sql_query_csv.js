@@ -5,7 +5,7 @@ export default defineComponent({
   name: "SQL Query CSV",
   description: "Use a SQL query to get data from CSV data",
   key: "sql_query_csv",
-  version: "0.1.0",
+  version: "0.1.1",
   type: "action",
 
   props: {
@@ -18,7 +18,6 @@ export default defineComponent({
       type: "boolean[]",
       label: "CSV inputs have header row?",
       description: "Whether the CSV data inputs have header rows (one boolean per CSV input). If so, the data rows' data will be keyed on field names instead of indexes.",
-      default: true,
     },
     sql_query: {
       type: "string",
