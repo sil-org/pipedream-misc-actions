@@ -35,6 +35,8 @@ describe(component.name, () => {
     component.body = process.env.EMAIL_TEST_BODY
     assert.ok(component.body, 'No email body provided')
 
+    component.attachmentContent = []
+
     const response = await component.run({
       steps: { trigger: {} },
       $: {}
