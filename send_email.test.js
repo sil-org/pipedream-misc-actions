@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
+
+const { default: component } = await import('./send_email.js')
+
+describe(component.name, (testContext) => {
+  it('should be able to send an email without an attachment', async () => {
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID
+    if (!accessKeyId) {
+      testContext.skip('No `AWS_ACCESS_KEY_ID` env. var. provided, skipping email test')
+    }
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+    if (!secretAccessKey) {
+      testContext.skip('No `AWS_SECRET_ACCESS_KEY` env. var. provided, skipping email test')
+    }
+    if (process.env.EMAIL_TEST_ATTACHMENT) {
+      testContext.skip('A `TEST_EMAIL_ATTACHMENT` was provided, so skipping "without attachment" test')
+    }
+    component.amazon_ses.$auth = { accessKeyId, secretAccessKey }
+
+    component.to = process.env.EMAIL_TEST_TO
+    assert.ok(component.to, 'No "To" address provided')
+
+    component.from = process.env.EMAIL_TEST_FROM
+    assert.ok(component.from, 'No "From" address provided')
+
+    component.subject = process.env.EMAIL_TEST_SUBJECT
+    assert.ok(component.subject, 'No email subject provided')
+
+    component.body = process.env.EMAIL_TEST_BODY
+    assert.ok(component.body, 'No email body provided')
+
+    const response = await component.run({
+      steps: { trigger: {} },
+      $: {}
+    })
+
+    assert.ok(response.MessageId, 'No MessageId was returned')
+  })
+})
