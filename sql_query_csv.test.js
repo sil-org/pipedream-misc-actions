@@ -8,14 +8,18 @@ const { default: component } = await import('./sql_query_csv.js')
 const invalidCsvContent = `Title,Genre,Author
 "Pride and Prejudice",Fiction,"J`
 
-const validCsvContent = `Title,Genre,Author
+const booksCsvContent = `Title,Genre,Author
 "The Hobbit",Fantasy,"J.R.R. Tolkien"
 "Pride and Prejudice",Fiction,"Jane Austen"`
 
+const authorsCsvContent = `Name,Born,Died
+"J.R.R. Tolkien",1892,1973
+"Jane Austen",1775,1817`
+
 describe('SQL Query CSV', () => {
   it('should retrieve the specified CSV row data', async () => {
-    component.csv_content = validCsvContent
-    component.csv_has_header = true
+    component.csv_inputs = [booksCsvContent]
+    component.csv_inputs_have_header = [true]
     component.sql_query = 'SELECT Title FROM ? WHERE Genre = "Fiction"'
 
     const response = await component.run({
@@ -23,21 +27,18 @@ describe('SQL Query CSV', () => {
       $: {}
     })
 
-    assert.deepStrictEqual(
-      response,
-      {
-        "rows": [
-          {
-            "Title": "Pride and Prejudice"
-          }
-        ]
-      }
+    assert.equal(response.errors, undefined)
+    assert.deepEqual(
+      response.rows,
+      [
+        { "Title": "Pride and Prejudice" }
+      ]
     )
   })
 
   it('should handle CSV-parsing errors', async () => {
-    component.csv_content = invalidCsvContent
-    component.csv_has_header = true
+    component.csv_inputs = [invalidCsvContent]
+    component.csv_inputs_have_header = [true]
     component.sql_query = 'SELECT Title FROM ? WHERE Genre = "Fiction"'
 
     const response = await component.run({
@@ -48,6 +49,34 @@ describe('SQL Query CSV', () => {
     assert.ok(
       response.errors?.length > 0,
       'Failed to return an error when given invalid CSV data'
+    )
+  })
+
+  it('should accept multiple CSVs, such as for a JOIN', async () => {
+    component.csv_inputs = [booksCsvContent, authorsCsvContent]
+    component.csv_inputs_have_header = [true, true]
+    component.sql_query = `
+      SELECT
+        books.Title,
+        authors.Name,
+        authors.Born
+      FROM ? AS books
+      JOIN ? AS authors
+        ON books.Author = authors.Name
+      WHERE books.Genre = "Fantasy"
+    `
+
+    const response = await component.run({
+      steps: { trigger: {} },
+      $: {}
+    })
+
+    assert.equal(response.errors, undefined)
+    assert.deepEqual(
+      response.rows,
+      [
+        { Born: "1892", Name: "J.R.R. Tolkien", Title: "The Hobbit" }
+      ]
     )
   })
 })
