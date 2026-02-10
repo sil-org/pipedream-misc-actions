@@ -16,7 +16,7 @@ describe(component.name, () => {
       return
     }
     if (process.env.EMAIL_TEST_ATTACHMENT) {
-      testContext.skip('A `TEST_EMAIL_ATTACHMENT` was provided, so skipping "without attachment" test')
+      testContext.skip('An `EMAIL_TEST_ATTACHMENT` was provided, so skipping "without attachment" test')
       return
     }
     component.amazon_ses = {
