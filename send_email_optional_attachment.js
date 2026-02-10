@@ -28,7 +28,8 @@ module.exports = defineComponent({
     attachmentContent: {
       type: "string[]",
       label: "Attachment Content",
-      optional: true
+      optional: true,
+      default: [],
     },
     attachmentType: {
       type: "string[]",
