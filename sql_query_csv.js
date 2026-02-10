@@ -23,7 +23,7 @@ export default defineComponent({
     sql_query: {
       type: "string",
       label: "SQL query",
-      description: "The SQL query to run against the provided CSV data. Use a question mark (?) for where you want to use each CSV input (e.g as the table name), in order.",
+      description: "The SQL query to run against the provided CSV data. Use a question mark (?) for where you want to use each CSV input (e.g as the table name), in order. Documentation: https://github.com/AlaSQL/alasql/wiki/Alasql-Object",
     },
   },
   async run({ steps, $ }) {
