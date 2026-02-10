@@ -3,18 +3,21 @@ import { describe, it } from 'node:test'
 
 const { default: component } = await import('./send_email.js')
 
-describe(component.name, (testContext) => {
-  it('should be able to send an email without an attachment', async () => {
+describe(component.name, () => {
+  it('should be able to send an email without an attachment', async (testContext) => {
     const accessKeyId = process.env.AWS_ACCESS_KEY_ID
     if (!accessKeyId) {
       testContext.skip('No `AWS_ACCESS_KEY_ID` env. var. provided, skipping email test')
+      return
     }
     const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
     if (!secretAccessKey) {
       testContext.skip('No `AWS_SECRET_ACCESS_KEY` env. var. provided, skipping email test')
+      return
     }
     if (process.env.EMAIL_TEST_ATTACHMENT) {
       testContext.skip('A `TEST_EMAIL_ATTACHMENT` was provided, so skipping "without attachment" test')
+      return
     }
     component.amazon_ses.$auth = { accessKeyId, secretAccessKey }
 
