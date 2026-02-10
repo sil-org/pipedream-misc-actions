@@ -24,16 +24,16 @@ describe(component.name, () => {
     }
 
     component.to = process.env.EMAIL_TEST_TO
-    assert.ok(component.to, 'No "To" address provided')
+    assert.ok(component.to, 'No "To Address" provided (use EMAIL_TEST_TO)')
 
     component.from = process.env.EMAIL_TEST_FROM
-    assert.ok(component.from, 'No "From" address provided')
+    assert.ok(component.from, 'No "From Address" provided (use EMAIL_TEST_FROM)')
 
     component.subject = process.env.EMAIL_TEST_SUBJECT
-    assert.ok(component.subject, 'No email subject provided')
+    assert.ok(component.subject, 'No "Subject" provided (use EMAIL_TEST_SUBJECT)')
 
     component.body = process.env.EMAIL_TEST_BODY
-    assert.ok(component.body, 'No email body provided')
+    assert.ok(component.body, 'No "Body" provided (use EMAIL_TEST_BODY)')
 
     component.attachmentContent = []
 
@@ -65,16 +65,16 @@ describe(component.name, () => {
     }
 
     component.to = process.env.EMAIL_TEST_TO
-    assert.ok(component.to, 'No "To" address provided')
+    assert.ok(component.to, 'No "To Address" provided (use EMAIL_TEST_TO)')
 
     component.from = process.env.EMAIL_TEST_FROM
-    assert.ok(component.from, 'No "From" address provided')
+    assert.ok(component.from, 'No "From Address" provided (use EMAIL_TEST_FROM)')
 
     component.subject = process.env.EMAIL_TEST_SUBJECT
-    assert.ok(component.subject, 'No email subject provided')
+    assert.ok(component.subject, 'No "Subject" provided (use EMAIL_TEST_SUBJECT)')
 
     component.body = process.env.EMAIL_TEST_BODY
-    assert.ok(component.body, 'No email body provided')
+    assert.ok(component.body, 'No "Body" provided (use EMAIL_TEST_BODY)')
 
     component.attachmentFilename = ['example.csv']
     component.attachmentContent = [
