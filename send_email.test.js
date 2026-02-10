@@ -19,7 +19,9 @@ describe(component.name, () => {
       testContext.skip('A `TEST_EMAIL_ATTACHMENT` was provided, so skipping "without attachment" test')
       return
     }
-    component.amazon_ses.$auth = { accessKeyId, secretAccessKey }
+    component.amazon_ses = {
+      "$auth": { accessKeyId, secretAccessKey },
+    }
 
     component.to = process.env.EMAIL_TEST_TO
     assert.ok(component.to, 'No "To" address provided')
