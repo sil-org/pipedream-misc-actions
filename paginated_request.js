@@ -113,7 +113,7 @@ export default defineComponent({
       $.export("error", {
         message: err.message,
         code: err.response?.status,
-        body: err.response?.data,
+        data: err.response?.data,
       })
     }
   },
