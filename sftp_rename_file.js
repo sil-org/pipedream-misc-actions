@@ -17,12 +17,12 @@ export default defineComponent({
       type: "string",
       label: "File Path",
       description:
-        "Name of the file to remove or archive (e.g. /src/dir/example.csv)",
+        "Name of the file to rename (e.g. /src/dir/example.csv)",
     },
     destPath: {
       type: "string",
       label: "Destination Path",
-      description: "Pth of the file to move (e.g. /dest/dir/example.csv)",
+      description: "New file path (e.g. /dest/dir/example.csv)",
     },
   },
   async run({ steps, $ }) {
