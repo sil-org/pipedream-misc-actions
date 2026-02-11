@@ -3,7 +3,7 @@ import Client from "ssh2-sftp-client@^12.0.1";
 export default defineComponent({
   name: "Rename SFTP File",
   description:
-    "Moves a file by its path to a new destination on an SFTP host. Returns an error message.",
+    "Moves a file by its path to a new destination on an SFTP host. Returns an error or success message.",
   key: "sftp_rename_file",
   version: "0.0.1",
   type: "action",
