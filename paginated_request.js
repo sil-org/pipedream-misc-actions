@@ -2,7 +2,7 @@ export default defineComponent({
   name: "Paginated HTTP Request",
   description: "Creates a HTTP Request until end of paginated data or timeout is reached",
   key: "paginated_http_request",
-  version: "0.0.2",
+  version: "0.1.0",
   type: "action",
 
   props: {
@@ -78,35 +78,43 @@ export default defineComponent({
     }
   },
   async run({ $ }) {
-    const i = await this.getPaginationIndex()
-    const start = Date.now()
-    const results = []
-    let data = []
-    let count = 1
-    do {
-      const resp = await this.http_request.execute()
-      data = await this.getResponseData(resp)
+    try {
+      const i = await this.getPaginationIndex()
+      const start = Date.now()
+      const results = []
+      let data = []
+      let count = 1
+      do {
+        const resp = await this.http_request.execute()
+        data = await this.getResponseData(resp)
+  
+        if (!Array.isArray(data)) {
+          throw new Error(`Response data is not an array: ${typeof data}`);
+        }
+  
+        const increment = (this.pagination_type === "Offset") ? data.length : 1
+        const new_value = increment + Number(this.http_request.params[i].value)
+        this.http_request.params[i].value = new_value.toString()
+  
+        results.push(...data)
+  
+        if (await this.handleTimeout(start)) {
+          break
+        }
+        count++
+      } while (data.length > 0)
 
-      if (!Array.isArray(data)) {
-        throw new Error(`Response data is not an array: ${typeof data}`);
-      }
-
-      const increment = (this.pagination_type === "Offset") ? data.length : 1
-      const new_value = increment + Number(this.http_request.params[i].value)
-      this.http_request.params[i].value = new_value.toString()
-
-      results.push(...data)
-
-      if (await this.handleTimeout(start)) {
-        break
-      }
-      count++
-    } while (data.length > 0)
-
-    $.export(
-      "$summary",
-      `Successfully called ${this.http_request.method} ${this.http_request.url} ${count} times`
-    );
-    return results
+      $.export(
+        "$summary",
+        `Successfully called ${this.http_request.method} ${this.http_request.url} ${count} times`
+      );
+      return results
+    } catch (err) {
+      $.export("error", {
+        message: err.message,
+        code: err.response?.status,
+        data: err.response?.data,
+      })
+    }
   },
 })
