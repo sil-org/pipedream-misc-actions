@@ -10,3 +10,4 @@ A collection of custom Pipedream actions
 4. SQL Query Data - Use a SQL query on any data (such as from already-parsed CSV files)
 5. Graceful HTTP Request - Make a HTTP Request retrying on failure and return errors
 6. Download SFTP Files - Downloads all files from a directory on an SFTP host
+7. Rename SFTP File - Moves a file by its path to a new destination on an SFTP host
