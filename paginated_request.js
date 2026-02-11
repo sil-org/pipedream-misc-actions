@@ -2,7 +2,7 @@ export default defineComponent({
   name: "Paginated HTTP Request",
   description: "Creates a HTTP Request until end of paginated data or timeout is reached",
   key: "paginated_http_request",
-  version: "0.0.2",
+  version: "0.1.0",
   type: "action",
 
   props: {
