@@ -16,8 +16,7 @@ export default defineComponent({
     file: {
       type: "string",
       label: "File Path",
-      description:
-        "Name of the file to rename (e.g. /src/dir/example.csv)",
+      description: "Name of the file to rename (e.g. /src/dir/example.csv)",
     },
     destPath: {
       type: "string",
@@ -36,44 +35,32 @@ export default defineComponent({
       username,
       privateKey,
     };
-
-    /**
-     * Renames a file on the remote SFTP server.
-     *
-     * @param {string} file - Name of the file to remove or archive (e.g. /src/dir/example.csv)
-     * @param {string} dest - Path of the file to move (e.g. /dest/dir/example.csv)
-     * @param {Object} ftpConfig - SFTP configuration object
-     *
-     * @returns {string} - Error message if any, or empty string if successful
-     */
-    async function renameFile(file, dest, ftpConfig) {
-      const sftp = new Client();
-      let msg;
-      try {
-        await sftp.connect(ftpConfig);
-      } catch (error) {
-        const errMsg = error.message || error;
-        msg = "Error connecting to SFTP for moving file. Error: " + errMsg;
-        console.error(msg);
-        return;
-      }
-
-      try {
-        console.log(`moving file ${file}`);
-        await sftp.rename(file, dest);
-        msg = `succesfully moved ${file} to ${dest}`;
-        console.log(msg);
-      } catch (error) {
-        const errMsg = error.message || error;
-        msg = `Error moving file ${file} to ${dest}. Error: ` + errMsg;
-        console.error(msg);
-      } finally {
-        await sftp.end();
-        console.log("done");
-      }
-      return msg;
+    const file = this.file;
+    const dest = this.destPath;
+    const sftp = new Client();
+    let msg;
+    try {
+      await sftp.connect(ftpConfig);
+    } catch (error) {
+      const errMsg = error.message || error;
+      msg = "Error connecting to SFTP for moving file. Error: " + errMsg;
+      console.error(msg);
+      return;
     }
 
-    return await renameFile(this.file, this.destPath, ftpConfig);
+    try {
+      console.log(`moving file ${file}`);
+      await sftp.rename(file, dest);
+      msg = `succesfully moved ${file} to ${dest}`;
+      console.log(msg);
+    } catch (error) {
+      const errMsg = error.message || error;
+      msg = `Error moving file ${file} to ${dest}. Error: ` + errMsg;
+      console.error(msg);
+    } finally {
+      await sftp.end();
+      console.log("done");
+    }
+    return msg;
   },
 });
