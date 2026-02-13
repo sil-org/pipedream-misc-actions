@@ -15,7 +15,7 @@ export default {
     to: {
       type: "string",
       label: "To Addresses",
-      description: "Comma-separate list of email addresses for the To email header."
+      description: "Comma-separated list of email addresses for the To email header."
     },
     from: {
       type: "string",
