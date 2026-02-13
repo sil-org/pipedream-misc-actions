@@ -4,7 +4,7 @@ export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
-  version: "0.1.1",
+  version: "0.1.2",
   type: "action",
 
   props: {
@@ -14,7 +14,8 @@ export default {
     },
     to: {
       type: "string",
-      label: "To Address"
+      label: "To Addresses",
+      description: "Comma-separate list of email addresses for the To email header."
     },
     from: {
       type: "string",
@@ -26,7 +27,8 @@ export default {
     },
     body: {
       type: "string",
-      label: "Body"
+      label: "Body",
+      description: "Plain-text message body."
     },
     attachmentFilename: {
       type: "string[]",
