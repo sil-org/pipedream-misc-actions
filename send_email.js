@@ -4,7 +4,7 @@ export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
-  version: "0.1.1",
+  version: "0.1.2",
   type: "action",
 
   props: {
@@ -50,8 +50,20 @@ export default {
       default: "BASE64",
       optional: true
     },
+    skip: {
+      type: "boolean",
+      label: "Skip",
+      description: "Set Skip to TRUE or an expression that evaluates to true to skip this step.",
+      default: false,
+      optional: true,
+    }
   },
   async run({ steps, $ }) {
+    if (this.skip) {
+      $.export("$summary", `Skipped`)
+      return {}
+    }
+
     const { accessKeyId, secretAccessKey } = this.amazon_ses.$auth
 
     const ses = new AWS.SES({
