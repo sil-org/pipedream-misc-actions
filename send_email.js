@@ -14,7 +14,8 @@ export default {
     },
     to: {
       type: "string",
-      label: "To Address"
+      label: "To Addresses",
+      description: "Comma-separated list of email addresses for the To email header."
     },
     from: {
       type: "string",
@@ -26,7 +27,8 @@ export default {
     },
     body: {
       type: "string",
-      label: "Body"
+      label: "Body",
+      description: "Plain-text message body."
     },
     attachmentFilename: {
       type: "string[]",
