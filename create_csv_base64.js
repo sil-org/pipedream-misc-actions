@@ -3,6 +3,11 @@ import fs from "fs";
 import path from "path";
 
 export default defineComponent({
+  name: "Create CSV Base64",
+  description: "Create a base64-encoded CSV file from data array input",
+  key: "create_csv_base64",
+  version: "0.0.1",
+  type: "action",
   props: {
     data: {
       type: "any",
@@ -17,7 +22,7 @@ export default defineComponent({
     },
   },
 
-  async run() {
+  async run({ $ }) {
     if (!Array.isArray(this.data) || this.data.length === 0) {
       throw new Error("Data must be a non-empty array of objects");
     }
