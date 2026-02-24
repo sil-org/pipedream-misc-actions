@@ -1,4 +1,4 @@
-import { createObjectCsvWriter } from "csv-writer";
+import { createObjectCsvWriter } from "csv-writer@^1.6.0";
 import fs from "fs";
 import path from "path";
 
