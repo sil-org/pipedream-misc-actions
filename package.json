@@ -6,7 +6,8 @@
   "dependencies": {
     "alasql": "^4",
     "aws-sdk": "^2",
-    "papaparse": "^5",
-    "csv-writer": "^1.6.0"
+    "csv-writer": "^1.6.0",
+    "papaparse": "^5"
+
   }
 }
