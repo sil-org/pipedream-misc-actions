@@ -11,3 +11,4 @@ A collection of custom Pipedream actions
 5. Graceful HTTP Request - Make a HTTP Request retrying on failure and return errors
 6. Download SFTP Files - Downloads all files from a directory on an SFTP host
 7. Rename SFTP File - Moves a file by its path to a new destination on an SFTP host
+8. Create CSV Base64 - Create a base64-encoded CSV file from data array input
