@@ -4,7 +4,7 @@ export default defineComponent({
   name: "Foreach",
   description: "Runs a sub-workflow for each value of an array",
   key: "foreach",
-  version: "0.0.7",
+  version: "0.1.0",
   type: "action",
 
   props: {
@@ -13,7 +13,7 @@ export default defineComponent({
       label: "Records to loop",
       description: "The array of records to send to processing workflow",
     },
-    workflowURL: {
+    workflowUrl: {
       type: "string",
       label: "Processing workflow URL",
       description: "The HTTP endpoint to connect to that's processing single individual records from this workflow"
@@ -24,11 +24,11 @@ export default defineComponent({
       description: "Will be added as a Bearer token in the Authorization header in calls to the workflow URL. Should match the processing workflow.",
       secret: true
     },
-    wait: {
+    enableConcurrency: {
       type: "boolean",
-      label: "Wait for Results",
-      description: "Whether or not to wait for results of each action or keep going. (Default: true)",
-      default: true,
+      label: "Enable Concurrency",
+      description: "Whether to send requests concurrently or one at a time. (Default: false)",
+      default: false,
     },
     batchSize: {
       type: "integer",
@@ -55,21 +55,19 @@ export default defineComponent({
     if (!Array.isArray(this.records)) {
       this.records = [this.records]
     }
-    if (!this.wait && !(this.batchSize && this.batchInterval)) {
+    if (!this.enableConcurrency && !(this.batchSize && this.batchInterval)) {
       throw new Error("Batch Size and Interval are required if not waiting for results.")
     }
     
     const results = [];
     for (let i = 0; i < this.records.length; i++) {
       const resp = axios($, {
-        url: this.workflowURL,
+        url: this.workflowUrl,
         method: 'POST',
         data: this.records[i],
         headers: {Authorization: `Bearer ${this.apiToken}`}
       })
-      if (this.wait) {
-        results.push(await resp)
-      } else {
+      if (this.enableConcurrency) {
         results.push(resp)
         if (i > 0 && i % this.batchSize == 0) {
           const now = Date.now();
@@ -77,9 +75,11 @@ export default defineComponent({
           const elapsed = Date.now() - now;
           await this.delay(this.batchInterval - elapsed);
         }
+      } else {
+        results.push(await resp)
       }
     }
-    if (this.wait) {
+    if (!this.enableConcurrency) {
       return results
     }
   },
