@@ -5,12 +5,13 @@ export async function resolve(specifier, context, defaultResolve) {
       url:
         "data:text/javascript," +
         encodeURIComponent(`
-        export const axios = async ($, config) => {
-          globalThis.__axiosCalls = globalThis.__axiosCalls || [];
-          globalThis.__axiosCalls.push(config);
-          return { status: 200 };
-        };
-      `),
+      export const axios = async ($, config) => {
+        globalThis.__axiosCalls = globalThis.__axiosCalls || [];
+        globalThis.__axiosCalls.push(config);
+        return { status: 200 };
+      };
+    `),
+      shortCircuit: true,
     };
   }
 
