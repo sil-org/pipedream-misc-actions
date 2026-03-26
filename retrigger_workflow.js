@@ -40,10 +40,11 @@ export default {
     const previous_key = this.previous_key;
 
     const keys = await datastore.keys();
-    const next_key = keys.pop();
 
-    if (next_key === previous_key) {
-      throw new Error(`Infinite loop detected: ${next_key} == ${previous_key}`);
+    if (keys.includes(previous_key)) {
+      throw new Error(
+        `Infinite loop detected: ${previous_key} is still in the list of keys`,
+      );
     }
 
     if (keys.length > 0) {
