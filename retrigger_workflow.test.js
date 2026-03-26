@@ -47,7 +47,7 @@ describe("Retrigger Workflow", () => {
   it("should throw error on infinite loop detection", async () => {
     const mockDatastore = {
       async keys() {
-        return ["loop-key"];
+        return ["key-1", "loop-key", "key-2"];
       },
     };
 
