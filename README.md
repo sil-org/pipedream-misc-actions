@@ -12,3 +12,4 @@ A collection of custom Pipedream actions
 6. Download SFTP Files - Downloads all files from a directory on an SFTP host
 7. Rename SFTP File - Moves a file by its path to a new destination on an SFTP host
 8. Create CSV Base64 - Create a base64-encoded CSV file from data array input
+9. Retrigger Workflow - Start a recursive call to the same workflow
