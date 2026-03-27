@@ -65,5 +65,6 @@ jobs:
         run: |
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep '\.js$' | grep -v '\.test\.js$')
           for file in $changed_files; do
+            echo publishing $file to Pipedream
             pd publish $file
           done
