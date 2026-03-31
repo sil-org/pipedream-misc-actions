@@ -48,9 +48,17 @@ const updateMetric = async (sourceFileName, googleSheetId, googleServiceAccountK
   const rows = res.data.values || []
   const foundRow = rows.find(row => row[0] === sourceFileName)
 
-  let insertedNewRow
+  let insertedNewRow = false
   if (!foundRow) {
-    // ... do stuff to insert row
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: googleSheetId,
+      range: 'A:A',
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: [[sourceFileName, 1]]
+      }
+    })
+    insertedNewRow = true
   }
 
   return {
