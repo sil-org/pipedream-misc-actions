@@ -65,6 +65,23 @@ const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
   return headers.indexOf(recordType)
 }
 
+/**
+ * Get the specified column from the spreadsheet.
+ *
+ * @param {string} columnLetter
+ * @param sheets
+ * @param {string} googleSheetId
+ * @return {Promise<array>}
+ */
+const getColumn = async (columnLetter, sheets, googleSheetId) => {
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: googleSheetId,
+    range: columnLetter + ':' + columnLetter,
+  })
+  const rows = res.data.values || []
+  return rows
+}
+
 const updateMetric = async (
   sourceFileName,
   recordType,
@@ -88,18 +105,13 @@ const updateMetric = async (
     }
   }
 
-  // See if there is an existing row for this file
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: 'A:A',
-  })
-  const rows = res.data.values || []
-  const foundRow = rows.find(row => row[0] === sourceFileName)
+  const columnA = await getColumn('A', sheets, googleSheetId)
+  const rowForFileName = columnA.find(row => row[0] === sourceFileName)
 
   // Either insert a new row or update the existing row to count this record.
   let insertedNewRow = false
   let newCount
-  if (!foundRow) {
+  if (!rowForFileName) {
     newCount = 1
     const values = new Array(colIndexForRecordType + 1).fill("")
     values[0] = sourceFileName
@@ -114,9 +126,9 @@ const updateMetric = async (
     })
     insertedNewRow = true
   } else {
-    const rowIndex = rows.indexOf(foundRow) + 1
-    const colLetter = getColumnLetter(colIndexForRecordType)
-    const cellRange = `${colLetter}${rowIndex}`
+    const rowIndex = columnA.indexOf(rowForFileName) + 1
+    const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
+    const cellRange = `${columnLetterForRecordType}${rowIndex}`
     
     const cellRes = await sheets.spreadsheets.values.get({
       spreadsheetId: googleSheetId,
