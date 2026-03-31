@@ -26,7 +26,8 @@ export default {
     google_service_account_key: {
       type: "string",
       label: "Google Service Account Key",
-      description: "The JSON string of the Google Service Account Key"
+      description: "The JSON string of the Google Service Account Key",
+      secret: true,
     },
   },
   async run({ steps, $ }) {
