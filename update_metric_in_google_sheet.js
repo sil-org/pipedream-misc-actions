@@ -48,6 +48,23 @@ const getColumnLetter = (index) => {
   return letter
 }
 
+/**
+ * Find which column (in the header row) is for the given type of record.
+ *
+ * @param {string} recordType
+ * @param sheets
+ * @param {string} googleSheetId
+ * @return {Promise<number>}
+ */
+const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId: googleSheetId,
+    range: '1:1',
+  })
+  const headers = (headerRes.data.values || [])[0] || []
+  return headers.indexOf(recordType)
+}
+
 const updateMetric = async (
   sourceFileName,
   recordType,
@@ -60,15 +77,12 @@ const updateMetric = async (
   })
   const sheets = google.sheets({ version: 'v4', auth })
 
-  // Find which column is for the type of record being processed.
-  const headerRes = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-  })
-  const headers = (headerRes.data.values || [])[0] || []
-  let colIndex = headers.indexOf(recordType)
-
-  if (colIndex === -1) {
+  const colIndexForRecordType = await getIndexOfColumnFor(
+    recordType,
+    sheets,
+    googleSheetId
+  )
+  if (colIndexForRecordType === -1) {
     return {
       error: `No column found for record type: ${recordType}`
     }
@@ -87,9 +101,9 @@ const updateMetric = async (
   let newCount
   if (!foundRow) {
     newCount = 1
-    const values = new Array(colIndex + 1).fill("")
+    const values = new Array(colIndexForRecordType + 1).fill("")
     values[0] = sourceFileName
-    values[colIndex] = newCount
+    values[colIndexForRecordType] = newCount
     await sheets.spreadsheets.values.append({
       spreadsheetId: googleSheetId,
       range: 'A1',
@@ -101,7 +115,7 @@ const updateMetric = async (
     insertedNewRow = true
   } else {
     const rowIndex = rows.indexOf(foundRow) + 1
-    const colLetter = getColumnLetter(colIndex)
+    const colLetter = getColumnLetter(colIndexForRecordType)
     const cellRange = `${colLetter}${rowIndex}`
     
     const cellRes = await sheets.spreadsheets.values.get({
