@@ -39,6 +39,15 @@ export default {
   },
 }
 
+const getColumnLetter = (index) => {
+  let letter = ''
+  while (index >= 0) {
+    letter = String.fromCharCode((index % 26) + 65) + letter
+    index = Math.floor(index / 26) - 1
+  }
+  return letter
+}
+
 const updateMetric = async (
   sourceFileName,
   recordType,
@@ -92,14 +101,6 @@ const updateMetric = async (
     insertedNewRow = true
   } else {
     const rowIndex = rows.indexOf(foundRow) + 1
-    const getColumnLetter = (index) => {
-      let letter = ''
-      while (index >= 0) {
-        letter = String.fromCharCode((index % 26) + 65) + letter
-        index = Math.floor(index / 26) - 1
-      }
-      return letter
-    }
     const colLetter = getColumnLetter(colIndex)
     const cellRange = `${colLetter}${rowIndex}`
     
