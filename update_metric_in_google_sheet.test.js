@@ -33,6 +33,7 @@ describe.only(component.name, () => {
       $: {}
     })
 
+    console.debug(response)
     assert.ok(
       response.error !== undefined,
       'Expected an error, but none returned'
@@ -57,10 +58,7 @@ describe.only(component.name, () => {
       $: {}
     })
 
-    if (response.error) {
-       console.log("Response error in test:", response.error)
-    }
-
+    console.debug(response)
     assert.ok(response.insertedNewRow)
     assert.equal(response.newCount, 1)
     assert.equal(response.error, undefined)
@@ -84,6 +82,7 @@ describe.only(component.name, () => {
       $: {}
     })
 
+    console.debug(response)
     assert.equal(response.insertedNewRow, false)
     assert.ok(response.newCount > 0)
     assert.equal(response.error, undefined)
