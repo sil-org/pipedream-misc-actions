@@ -19,6 +19,7 @@ describe.only(component.name, () => {
     const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+      return
     }
     const googleSheetId = process.env.GOOGLE_SHEET_ID
     assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
@@ -44,6 +45,7 @@ describe.only(component.name, () => {
     const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+      return
     }
     const googleSheetId = process.env.GOOGLE_SHEET_ID
     assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
@@ -68,6 +70,7 @@ describe.only(component.name, () => {
     const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+      return
     }
     const googleSheetId = process.env.GOOGLE_SHEET_ID
     assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
