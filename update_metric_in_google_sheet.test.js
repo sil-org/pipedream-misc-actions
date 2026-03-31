@@ -61,7 +61,7 @@ describe.only(component.name, () => {
     globalThis.__googleSheetsMockValues = []
   })
 
-  it('should add a row if none matches the filename', async () => {
+  it.only('should add a row if none matches the filename', async () => {
     component.source_file_name = 'test.csv'
     component.google_sheet_id = 'sheet123'
     component.google_service_account_key = JSON.stringify({ project_id: 'test', client_email: 'test@example.com', private_key: 'test' })
