@@ -40,14 +40,17 @@ const updateMetric = async (sourceFileName, googleSheetId, googleServiceAccountK
   })
   const sheets = google.sheets({ version: 'v4', auth })
 
+  // TODO: Find which column is for the type of record being processed.
+
+  // See if there is an existing row for this file
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: googleSheetId,
     range: 'A:A',
   })
-
   const rows = res.data.values || []
   const foundRow = rows.find(row => row[0] === sourceFileName)
 
+  // Either insert a new row or update the existing row to count this record.
   let insertedNewRow = false
   if (!foundRow) {
     await sheets.spreadsheets.values.append({
@@ -55,14 +58,17 @@ const updateMetric = async (sourceFileName, googleSheetId, googleServiceAccountK
       range: 'A:A',
       valueInputOption: 'USER_ENTERED',
       resource: {
-        values: [[sourceFileName, 1]]
+        values: [[sourceFileName]]
       }
     })
     insertedNewRow = true
+  } else {
+    // TODO: Update the existing cell
   }
 
   return {
     insertedNewRow,
+    // ...
   }
 }
 
