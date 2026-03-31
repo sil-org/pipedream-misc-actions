@@ -8,6 +8,7 @@
     "alasql": "^4",
     "aws-sdk": "^2",
     "csv-writer": "^1.6.0",
+    "googleapis": "^144",
     "papaparse": "^5"
 
   }
