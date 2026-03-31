@@ -62,6 +62,7 @@ describe.only(component.name, () => {
     }
 
     assert.ok(response.insertedNewRow)
+    assert.equal(response.newCount, 1)
     assert.equal(response.error, undefined)
   })
 
@@ -84,6 +85,7 @@ describe.only(component.name, () => {
     })
 
     assert.equal(response.insertedNewRow, false)
+    assert.ok(response.newCount > 0)
     assert.equal(response.error, undefined)
   })
 })

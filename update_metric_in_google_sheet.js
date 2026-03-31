@@ -75,10 +75,12 @@ const updateMetric = async (
 
   // Either insert a new row or update the existing row to count this record.
   let insertedNewRow = false
+  let newCount
   if (!foundRow) {
+    newCount = 1
     const values = new Array(colIndex + 1).fill("")
     values[0] = sourceFileName
-    values[colIndex] = 1
+    values[colIndex] = newCount
     await sheets.spreadsheets.values.append({
       spreadsheetId: googleSheetId,
       range: 'A1',
@@ -106,19 +108,20 @@ const updateMetric = async (
       range: cellRange,
     })
     const currentVal = parseInt((cellRes.data.values || [[]])[0][0] || 0)
-    
+    newCount = currentVal + 1
     await sheets.spreadsheets.values.update({
       spreadsheetId: googleSheetId,
       range: cellRange,
       valueInputOption: 'USER_ENTERED',
       resource: {
-        values: [[currentVal + 1]]
+        values: [[newCount]]
       }
     })
   }
 
   return {
     insertedNewRow,
+    newCount,
   }
 }
 
