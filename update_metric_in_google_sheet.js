@@ -1,3 +1,5 @@
+import { google } from 'googleapis@^144'
+
 export default {
   name: "Update Metric (Google Sheet)",
   description: "Increment the counter for how many records of a given type were processed, in a Google Sheet",
@@ -32,7 +34,6 @@ export default {
 }
 
 const updateMetric = async (sourceFileName, googleSheetId, googleServiceAccountKey) => {
-  const { google } = await import('googleapis')
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(googleServiceAccountKey),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
