@@ -14,8 +14,8 @@ try {
 
 const { default: component } = await import('./update_metric_in_google_sheet.js')
 
-describe.only(component.name, () => {
-  it.only('should report an error if no column is found for that record type', async (testContext) => {
+describe(component.name, () => {
+  it('should report an error if no column is found for that record type', async (testContext) => {
     const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
@@ -41,7 +41,7 @@ describe.only(component.name, () => {
     )
   })
 
-  it.only('should add a row if none matches the filename', async (testContext) => {
+  it('should add a row if none matches the filename', async (testContext) => {
     const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
@@ -66,7 +66,7 @@ describe.only(component.name, () => {
     assert.equal(response.error, undefined)
   })
 
-  it.only('should update the existing row if one matches the filename', async (testContext) => {
+  it('should update the existing row if one matches the filename', async (testContext) => {
     const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
