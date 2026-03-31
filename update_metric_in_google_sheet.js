@@ -134,8 +134,8 @@ const updateMetric = async (
       spreadsheetId: googleSheetId,
       range: cellRange,
     })
-    const currentVal = parseInt((cellRes.data.values || [[]])[0][0] || 0)
-    newCount = currentVal + 1
+    const previousCount = parseInt((cellRes.data.values || [[]])[0][0] || 0)
+    newCount = previousCount + 1
     await sheets.spreadsheets.values.update({
       spreadsheetId: googleSheetId,
       range: cellRange,
