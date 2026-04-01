@@ -115,7 +115,7 @@ const updateMetric = async (
   if (!rowForFileName) {
     newCount = 1
     const values = new Array(Math.max(colIndexForRecordType, 1) + 1).fill("")
-    values[0] = new Date().toLocaleString()
+    values[0] = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     values[1] = sourceFileName
     values[colIndexForRecordType] = newCount
     await sheets.spreadsheets.values.append({
