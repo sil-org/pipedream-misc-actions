@@ -30,6 +30,9 @@ jobs:
 
       - name: Test
         run: npm test
+        env:
+          TEST_GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.TEST_GOOGLE_SERVICE_ACCOUNT_KEY }}
+          TEST_GOOGLE_SHEET_ID: ${{ secrets.TEST_GOOGLE_SHEET_ID }}
 
   publish:
     name: Publish

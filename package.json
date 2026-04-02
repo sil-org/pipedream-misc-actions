@@ -1,12 +1,14 @@
 {
   "type": "module",
   "scripts": {
-    "test": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test"
+    "test": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test",
+    "test-only": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test --test-only"
   },
   "dependencies": {
     "alasql": "^4",
     "aws-sdk": "^2",
     "csv-writer": "^1.6.0",
+    "googleapis": "^144",
     "papaparse": "^5"
 
   }
