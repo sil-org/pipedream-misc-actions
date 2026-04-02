@@ -16,12 +16,12 @@ const { default: component } = await import('./update_metric_in_google_sheet.js'
 
 describe(component.name, () => {
   it('should report an error if no column is found for that record type', async (testContext) => {
-    const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+    const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
       return
     }
-    const googleSheetId = process.env.GOOGLE_SHEET_ID
+    const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
     assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
 
     component.source_file_name = 'test.csv'
@@ -42,12 +42,12 @@ describe(component.name, () => {
   })
 
   it('should add a row if none matches the filename', async (testContext) => {
-    const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+    const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
       return
     }
-    const googleSheetId = process.env.GOOGLE_SHEET_ID
+    const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
     assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
 
     component.source_file_name = 'TEST_' + Date.now() + '.csv'
@@ -67,12 +67,12 @@ describe(component.name, () => {
   })
 
   it('should update the existing row if one matches the filename', async (testContext) => {
-    const googleServiceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+    const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
       return
     }
-    const googleSheetId = process.env.GOOGLE_SHEET_ID
+    const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
     assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
 
     component.source_file_name = 'test.csv'
