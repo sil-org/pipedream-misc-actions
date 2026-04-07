@@ -173,9 +173,9 @@ describe(component.name, () => {
     })
 
     console.debug(response)
+    assert.equal(response.error, undefined)
     assert.equal(response.insertedNewRow, false)
     assert.equal(response.runID, component.run_id)
     assert.ok(response.newCount > 0)
-    assert.equal(response.error, undefined)
   })
 })
