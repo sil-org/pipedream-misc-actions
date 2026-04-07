@@ -13,6 +13,11 @@ export default {
       label: "File Name",
       description: "The name of the file being processed"
     },
+    run_id: {
+      type: "string",
+      label: "Run ID",
+      description: "The unique ID for this run (to prevent double-counting when the same file is processed more than once). The Dispatcher should set this to 'NEW' (to generate a new value). Subworkflows should provide the value given them by the Dispatcher."
+    },
     record_type: {
       type: "string",
       label: "Record Type",
@@ -33,6 +38,7 @@ export default {
   async run({ steps, $ }) {
     return await updateMetric(
       this.source_file_name,
+      this.run_id,
       this.record_type,
       this.google_sheet_id,
       this.google_service_account_key,
@@ -85,6 +91,7 @@ const getColumn = async (columnLetter, sheets, googleSheetId) => {
 
 const updateMetric = async (
   sourceFileName,
+  runID,
   recordType,
   googleSheetId,
   googleServiceAccountKey
@@ -151,6 +158,7 @@ const updateMetric = async (
   return {
     insertedNewRow,
     newCount,
+    runID
   }
 }
 
