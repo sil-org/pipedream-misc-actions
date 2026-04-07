@@ -100,12 +100,6 @@ const updateMetric = async (
     return { error: 'No Run ID was provided' }
   }
 
-  let isNewRunID = false
-  if (runID === 'NEW') {
-    isNewRunID = true
-    runID = generateNewRunID()
-  }
-
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(googleServiceAccountKey),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -121,17 +115,21 @@ const updateMetric = async (
     return { error: `No column found for record type: ${recordType}` }
   }
 
-  const fileNameColumnValues = await getColumn('B', sheets, googleSheetId)
-  const rowWithFileName = fileNameColumnValues.find(row => row[0] === sourceFileName)
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: googleSheetId,
+    range: 'A:C',
+  })
+  const identifierRows = response.data.values || []
 
-  // Either insert a new row or update the existing row to count this record.
   let insertedNewRow = false
   let newCount
-  if (!rowWithFileName) {
-    newCount = 1
-    const values = new Array(Math.max(colIndexForRecordType, 1) + 1).fill("")
+
+  if (runID === 'NEW') {
+    runID = generateNewRunID()
+    const values = new Array(Math.max(colIndexForRecordType, 2) + 1).fill("")
     values[0] = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     values[1] = sourceFileName
+    values[2] = runID
     values[colIndexForRecordType] = newCount
     await sheets.spreadsheets.values.append({
       spreadsheetId: googleSheetId,
@@ -143,15 +141,20 @@ const updateMetric = async (
     })
     insertedNewRow = true
   } else {
-    const fileNameRowIndex = fileNameColumnValues.indexOf(rowWithFileName) + 1
+    let rowToUpdateIndex = identifierRows.findIndex(row => row[1] === sourceFileName && row[2] === runID)
+    if (rowToUpdateIndex === -1) {
+      return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
+    }
+
+    const fileNameRowNumber = rowToUpdateIndex + 1 // Indexes starts at 0. Numbers starts at 1.
     const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
-    const cellRange = `${columnLetterForRecordType}${fileNameRowIndex}`
+    const cellRange = `${columnLetterForRecordType}${fileNameRowNumber}`
     
-    const cellRes = await sheets.spreadsheets.values.get({
+    const getCellResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: googleSheetId,
       range: cellRange,
     })
-    const previousCount = parseInt((cellRes.data.values || [[]])[0][0] || 0)
+    const previousCount = parseInt((getCellResponse.data.values || [[]])[0][0] || 0)
     newCount = previousCount + 1
     await sheets.spreadsheets.values.update({
       spreadsheetId: googleSheetId,
@@ -166,7 +169,7 @@ const updateMetric = async (
   return {
     insertedNewRow,
     newCount,
-    runID
+    runID,
   }
 }
 
