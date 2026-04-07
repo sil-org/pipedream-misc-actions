@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { randomUUID } from 'node:crypto'
 import { loadEnvFile } from 'node:process'
 import { describe, it } from 'node:test'
 
@@ -139,15 +140,17 @@ describe(component.name, () => {
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
+    const exampleEventId = randomUUID()
+    const exampleEventIdPrefix = exampleEventId.substring(0, 8)
     const response = await component.run({
-      steps: { trigger: {} },
+      steps: { trigger: { event: { id: exampleEventId } } },
       $: {}
     })
 
     console.debug(response)
     assert.equal(response.error, undefined)
     assert.ok(response.insertedNewRow)
-    assert.ok(response.runID)
+    assert.equal(response.runID, exampleEventIdPrefix)
     assert.notEqual(response.runID, 'NEW')
     assert.equal(response.newCount, undefined)
   })
