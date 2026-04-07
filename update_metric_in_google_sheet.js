@@ -16,7 +16,7 @@ export default {
     run_id: {
       type: "string",
       label: "Run ID",
-      description: "The unique ID for this run (to prevent double-counting when the same file is processed more than once). The Dispatcher should set this to 'NEW' (to generate a new value). Subworkflows should provide the value given them by the Dispatcher."
+      description: "The unique ID for this run (to prevent double-counting when the same file is processed more than once). The Dispatcher should set this to 'NEW' (to add a row with a new Run ID). Sub-workflows should provide the value given them by the Dispatcher."
     },
     record_type: {
       type: "string",
