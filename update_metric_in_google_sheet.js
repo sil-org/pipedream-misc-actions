@@ -142,9 +142,9 @@ const updateMetric = async (
       return { error: `No column found for record type: ${recordType}` }
     }
 
-    const fileNameRowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
+    const rowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
     const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
-    const cellRange = `${columnLetterForRecordType}${fileNameRowNumber}`
+    const cellRange = `${columnLetterForRecordType}${rowNumber}`
     
     const getCellResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: googleSheetId,
