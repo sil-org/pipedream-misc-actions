@@ -113,8 +113,8 @@ const updateMetric = async (
     }
   }
 
-  const columnB = await getColumn('B', sheets, googleSheetId)
-  const rowForFileName = columnB.find(row => row[0] === sourceFileName)
+  const fileNameColumn = await getColumn('B', sheets, googleSheetId)
+  const rowForFileName = fileNameColumn.find(row => row[0] === sourceFileName)
 
   // Either insert a new row or update the existing row to count this record.
   let insertedNewRow = false
@@ -135,7 +135,7 @@ const updateMetric = async (
     })
     insertedNewRow = true
   } else {
-    const rowIndex = columnB.indexOf(rowForFileName) + 1
+    const rowIndex = fileNameColumn.indexOf(rowForFileName) + 1
     const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
     const cellRange = `${columnLetterForRecordType}${rowIndex}`
     
