@@ -118,12 +118,6 @@ const updateMetric = async (
   })
   const sheets = google.sheets({ version: 'v4', auth })
 
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: 'A:C',
-  })
-  const identifierRows = response.data.values || []
-
   let insertedNewRow = false
   let newCount
 
@@ -145,7 +139,13 @@ const updateMetric = async (
     })
     insertedNewRow = true
   } else {
-    let rowToUpdateIndex = identifierRows.findIndex(row => row[1] === sourceFileName && row[2] === runID)
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: 'B:C',
+    })
+    const fileNamesAndRunIDs = response.data.values || []
+
+    let rowToUpdateIndex = fileNamesAndRunIDs.findIndex(row => row[0] === sourceFileName && row[1] === runID)
     if (rowToUpdateIndex === -1) {
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
