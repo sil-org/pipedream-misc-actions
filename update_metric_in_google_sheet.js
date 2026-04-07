@@ -138,11 +138,12 @@ const updateMetric = async (
 
   if (runID === 'NEW') {
     runID = generateNewRunID()
-    const values = new Array(Math.max(colIndexForRecordType, 2) + 1).fill("")
-    values[0] = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
-    values[1] = sourceFileName
-    values[2] = runID
-    values[colIndexForRecordType] = newCount
+    const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+    const values = [
+      jobRunDateTime,
+      sourceFileName,
+      runID,
+    ]
     await sheets.spreadsheets.values.append({
       spreadsheetId: googleSheetId,
       range: 'A1',
