@@ -100,6 +100,12 @@ const updateMetric = async (
     return { error: 'No Run ID was provided' }
   }
 
+  let isNewRunID = false
+  if (runID === 'NEW') {
+    isNewRunID = true
+    runID = generateNewRunID()
+  }
+
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(googleServiceAccountKey),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -165,6 +171,8 @@ const updateMetric = async (
     runID
   }
 }
+
+const generateNewRunID = () => Math.random().toString(36).substring(2, 10)
 
 export {
   updateMetric,
