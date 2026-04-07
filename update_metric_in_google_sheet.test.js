@@ -69,6 +69,34 @@ describe(component.name, () => {
     )
   })
 
+  it('should report an error if given a Record Type when generating a new row', async (testContext) => {
+    const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
+    if (!googleServiceAccountKey) {
+      testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+      return
+    }
+    const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
+    assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+
+    component.run_id = 'NEW'
+    component.source_file_name = 'test.csv'
+    component.record_type = 'ICJEs'
+    component.google_sheet_id = googleSheetId
+    component.google_service_account_key = googleServiceAccountKey
+
+    const response = await component.run({
+      steps: { trigger: {} },
+      $: {}
+    })
+
+    console.debug(response)
+    const errorMessage = String(response.error)
+    assert.ok(
+      errorMessage.includes('Record Type') && errorMessage.includes('new'),
+      'Expected an error about providing a Record Type when generating a new Run ID'
+    )
+  })
+
   it('should return an error if no row has the given the File Name and Run ID', async (testContext) => {
     const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
@@ -107,7 +135,7 @@ describe(component.name, () => {
 
     component.run_id = 'NEW'
     component.source_file_name = 'test.csv'
-    component.record_type = 'ICJEs'
+    component.record_type = ''
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -117,11 +145,11 @@ describe(component.name, () => {
     })
 
     console.debug(response)
+    assert.equal(response.error, undefined)
     assert.ok(response.insertedNewRow)
     assert.ok(response.runID)
     assert.notEqual(response.runID, 'NEW')
     assert.equal(response.newCount, undefined)
-    assert.equal(response.error, undefined)
   })
 
   it('should update the existing row if one matches the File Name and Run ID', async (testContext) => {
@@ -146,7 +174,7 @@ describe(component.name, () => {
 
     console.debug(response)
     assert.equal(response.insertedNewRow, false)
-    assert.equal(response.run_id, component.run_id)
+    assert.equal(response.runID, component.run_id)
     assert.ok(response.newCount > 0)
     assert.equal(response.error, undefined)
   })
