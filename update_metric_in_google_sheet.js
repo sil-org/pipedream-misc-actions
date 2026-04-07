@@ -74,23 +74,6 @@ const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
   return headers.indexOf(recordType)
 }
 
-/**
- * Get the specified column from the spreadsheet.
- *
- * @param {string} columnLetter
- * @param sheets
- * @param {string} googleSheetId
- * @return {Promise<array>}
- */
-const getColumn = async (columnLetter, sheets, googleSheetId) => {
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: columnLetter + ':' + columnLetter,
-  })
-  const rows = res.data.values || []
-  return rows
-}
-
 const updateMetric = async (
   sourceFileName,
   runID,
