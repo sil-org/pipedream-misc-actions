@@ -118,15 +118,6 @@ const updateMetric = async (
   })
   const sheets = google.sheets({ version: 'v4', auth })
 
-  const colIndexForRecordType = await getIndexOfColumnFor(
-    recordType,
-    sheets,
-    googleSheetId
-  )
-  if (colIndexForRecordType === -1) {
-    return { error: `No column found for record type: ${recordType}` }
-  }
-
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: googleSheetId,
     range: 'A:C',
@@ -157,6 +148,15 @@ const updateMetric = async (
     let rowToUpdateIndex = identifierRows.findIndex(row => row[1] === sourceFileName && row[2] === runID)
     if (rowToUpdateIndex === -1) {
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
+    }
+
+    const colIndexForRecordType = await getIndexOfColumnFor(
+      recordType,
+      sheets,
+      googleSheetId
+    )
+    if (colIndexForRecordType === -1) {
+      return { error: `No column found for record type: ${recordType}` }
     }
 
     const fileNameRowNumber = rowToUpdateIndex + 1 // Indexes starts at 0. Numbers starts at 1.
