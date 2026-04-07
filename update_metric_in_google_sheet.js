@@ -118,9 +118,7 @@ const updateMetric = async (
     googleSheetId
   )
   if (colIndexForRecordType === -1) {
-    return {
-      error: `No column found for record type: ${recordType}`
-    }
+    return { error: `No column found for record type: ${recordType}` }
   }
 
   const fileNameColumnValues = await getColumn('B', sheets, googleSheetId)
