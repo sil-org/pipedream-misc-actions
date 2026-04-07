@@ -13,4 +13,4 @@ A collection of custom Pipedream actions
 7. Rename SFTP File - Moves a file by its path to a new destination on an SFTP host
 8. Create CSV Base64 - Create a base64-encoded CSV file from data array input
 9. Retrigger Workflow - Start a recursive call to the same workflow
-10. Update Metric in Google Sheet - Add/Update row to increment count of records processed (by file and type)
+10. Update Metric in Google Sheet - Add/Update row to increment count of records processed (by file, run ID, and type)
