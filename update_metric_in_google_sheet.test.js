@@ -124,7 +124,7 @@ describe(component.name, () => {
     )
   })
 
-  it('should add a row (and generate a real Run ID) if given a Run ID of "NEW"', async (testContext) => {
+  it('should add a row (and use the event.id prefix as the actual Run ID) if given a Run ID of "NEW"', async (testContext) => {
     const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')

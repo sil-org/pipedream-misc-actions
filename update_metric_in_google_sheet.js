@@ -44,6 +44,7 @@ export default {
       this.record_type,
       this.google_sheet_id,
       this.google_service_account_key,
+      steps?.trigger?.event?.id,
     )
   },
 }
@@ -74,12 +75,22 @@ const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
   return headers.indexOf(recordType)
 }
 
+/**
+ * @param {string} sourceFileName
+ * @param {string} runID
+ * @param {string} recordType
+ * @param {string} googleSheetId
+ * @param {string} googleServiceAccountKey
+ * @param {string} fullEventId
+ * @return {Promise<Object>}
+ */
 const updateMetric = async (
   sourceFileName,
   runID,
   recordType,
   googleSheetId,
-  googleServiceAccountKey
+  googleServiceAccountKey,
+  fullEventId
 ) => {
   if (!runID) {
     return { error: 'No Run ID was provided' }
@@ -105,7 +116,11 @@ const updateMetric = async (
   let newCount
 
   if (runID === 'NEW') {
-    runID = generateNewRunID()
+    if (!fullEventId) {
+      return { error: 'No event.id was provided (for extracting a Run ID from)' }
+    }
+
+    runID = fullEventId.substring(0, 8)
     const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     const values = [
       jobRunDateTime,
