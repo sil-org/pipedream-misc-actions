@@ -97,9 +97,7 @@ const updateMetric = async (
   googleServiceAccountKey
 ) => {
   if (!runID) {
-    return {
-      error: 'No Run ID was provided',
-    }
+    return { error: 'No Run ID was provided' }
   }
 
   const auth = new google.auth.GoogleAuth({
