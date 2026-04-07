@@ -184,8 +184,6 @@ const updateMetric = async (
   }
 }
 
-const generateNewRunID = () => Math.random().toString(36).substring(2, 10)
-
 export {
   updateMetric,
 }
