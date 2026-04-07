@@ -117,10 +117,10 @@ const updateMetric = async (
 
   if (runID === 'NEW') {
     if (!fullEventId) {
-      return { error: 'No event.id was provided (for extracting a Run ID from)' }
+      return { error: 'No event.id was found/provided (to use as the new Run ID)' }
     }
 
-    runID = fullEventId.substring(0, 8)
+    runID = fullEventId
     const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     const values = [
       jobRunDateTime,

@@ -125,7 +125,7 @@ describe(component.name, () => {
     )
   })
 
-  it('should add a row (and use the event.id prefix as the actual Run ID) if given a Run ID of "NEW"', async (testContext) => {
+  it('should add a row (and use the event.id as the actual Run ID) if given a Run ID of "NEW"', async (testContext) => {
     const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
       testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
@@ -141,7 +141,6 @@ describe(component.name, () => {
     component.google_service_account_key = googleServiceAccountKey
 
     const exampleEventId = randomUUID()
-    const exampleEventIdPrefix = exampleEventId.substring(0, 8)
     const response = await component.run({
       steps: { trigger: { event: { id: exampleEventId } } },
       $: {}
@@ -150,7 +149,7 @@ describe(component.name, () => {
     console.debug(response)
     assert.equal(response.error, undefined)
     assert.ok(response.insertedNewRow)
-    assert.equal(response.runID, exampleEventIdPrefix)
+    assert.equal(response.runID, exampleEventId)
     assert.notEqual(response.runID, 'NEW')
     assert.equal(response.newCount, undefined)
   })
