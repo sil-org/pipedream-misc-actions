@@ -102,6 +102,16 @@ const updateMetric = async (
     return { error: 'No Run ID was provided' }
   }
 
+  if (runID === 'NEW') {
+    if (recordType) {
+      return {error: 'Do not provide a Record Type when generating a new Run ID'}
+    }
+  } else {
+    if (!recordType) {
+      return { error: 'A Record Type is required when updating metrics for a given Run ID' }
+    }
+  }
+
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(googleServiceAccountKey),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
