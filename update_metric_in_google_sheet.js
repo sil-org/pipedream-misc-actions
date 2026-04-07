@@ -21,7 +21,9 @@ export default {
     record_type: {
       type: "string",
       label: "Record Type",
-      description: "The type of the record being processed"
+      description: "The type of the record being processed. Do not provide when Run ID is 'NEW'.",
+      optional: true,
+      default: '',
     },
     google_sheet_id: {
       type: "string",
