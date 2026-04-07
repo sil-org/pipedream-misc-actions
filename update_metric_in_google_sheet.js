@@ -159,7 +159,7 @@ const updateMetric = async (
       return { error: `No column found for record type: ${recordType}` }
     }
 
-    const fileNameRowNumber = rowToUpdateIndex + 1 // Indexes starts at 0. Numbers starts at 1.
+    const fileNameRowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
     const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
     const cellRange = `${columnLetterForRecordType}${fileNameRowNumber}`
     
