@@ -96,6 +96,12 @@ const updateMetric = async (
   googleSheetId,
   googleServiceAccountKey
 ) => {
+  if (!runID) {
+    return {
+      error: 'No Run ID was provided',
+    }
+  }
+
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(googleServiceAccountKey),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
