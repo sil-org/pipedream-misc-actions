@@ -13,10 +13,10 @@ describe("Retrigger Workflow", () => {
       },
     };
 
-    component.data_store = mockDatastore;
+    component.datastore = mockDatastore;
     component.workflow_url = "https://example.com/workflow";
-    component.api_token = "test-token";
-    component.previous_key = "different-key";
+    component.authorization = "Bearer test-token";
+    component.current_key = "different-key";
 
     await component.run({ steps: {}, $: {} });
 
@@ -36,8 +36,8 @@ describe("Retrigger Workflow", () => {
       },
     };
 
-    component.data_store = mockDatastore;
-    component.previous_key = "key1";
+    component.datastore = mockDatastore;
+    component.current_key = "key1";
 
     await component.run({ steps: {}, $: {} });
 
@@ -51,8 +51,8 @@ describe("Retrigger Workflow", () => {
       },
     };
 
-    component.data_store = mockDatastore;
-    component.previous_key = "loop-key";
+    component.datastore = mockDatastore;
+    component.current_key = "loop-key";
 
     await assert.rejects(async () => {
       await component.run({ steps: {}, $: {} });

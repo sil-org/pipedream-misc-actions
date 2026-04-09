@@ -4,11 +4,11 @@ export default {
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "0.0.1",
+  version: "0.1.0",
   type: "action",
 
   props: {
-    data_store: {
+    datastore: {
       type: "data_store",
       label: "Datastore",
       description:
@@ -19,39 +19,35 @@ export default {
       label: "Workflow URL",
       description: "This workflow's HTTP endpoint",
     },
-    api_token: {
+    authorization: {
       type: "string",
-      label: "API Bearer token",
-      description:
-        "Will be added as a Bearer token in the Authorization header in calls to this workflow's URL.",
+      label: "Authorization header",
+      description: "The Authorization header in calls to this workflow's URL.",
       secret: true,
     },
-    previous_key: {
+    current_key: {
       type: "string",
-      label: "Previous Key",
+      label: "Current Key",
       description:
-        "This is the previous key for the record that was just processed, and will be used to help avoid infinite loops.",
+        "This is the current key for the record that was just processed, and will be used to help avoid infinite loops.",
     },
   },
   async run({ steps, $ }) {
-    const datastore = this.data_store;
-    const workflow_url = this.workflow_url;
-    const api_token = this.api_token;
-    const previous_key = this.previous_key;
+    const {datastore, workflow_url, authorization, current_key} = this
 
     const keys = await datastore.keys();
 
-    if (keys.includes(previous_key)) {
+    if (keys.includes(current_key)) {
       throw new Error(
-        `Infinite loop detected: ${previous_key} is still in the list of keys`,
+        `Infinite loop detected: ${current_key} is still in the list of keys`,
       );
     }
 
     if (keys.length > 0) {
       await axios($, {
         url: workflow_url,
-        method: "POST",
-        headers: { Authorization: `Bearer ${api_token}` },
+        method: "GET",
+        headers: { authorization },
       });
     }
   },
