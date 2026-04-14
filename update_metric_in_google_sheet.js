@@ -25,6 +25,13 @@ export default {
       optional: true,
       default: '',
     },
+    number_of_items: {
+      type: "number",
+      label: "Number of Items",
+      description: "How many items there were (i.e. how much to increment the recorded metrics by)",
+      optional: true,
+      default: 1,
+    },
     google_sheet_id: {
       type: "string",
       label: "Google Sheet ID",
@@ -42,6 +49,7 @@ export default {
       this.source_file_name,
       this.run_id,
       this.record_type,
+      this.number_of_items,
       this.google_sheet_id,
       this.google_service_account_key,
       steps?.trigger?.event?.id,
@@ -79,6 +87,7 @@ const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
  * @param {string} sourceFileName
  * @param {string} runID
  * @param {string} recordType
+ * @param {number} numberOfItems
  * @param {string} googleSheetId
  * @param {string} googleServiceAccountKey
  * @param {string} fullEventId
@@ -88,6 +97,7 @@ const updateMetric = async (
   sourceFileName,
   runID,
   recordType,
+  numberOfItems,
   googleSheetId,
   googleServiceAccountKey,
   fullEventId
@@ -167,7 +177,7 @@ const updateMetric = async (
       range: cellRange,
     })
     previousCount = parseInt((getCellResponse.data.values || [[]])[0][0] || 0)
-    newCount = previousCount + 1
+    newCount = previousCount + numberOfItems
     await sheets.spreadsheets.values.update({
       spreadsheetId: googleSheetId,
       range: cellRange,

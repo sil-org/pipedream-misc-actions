@@ -28,6 +28,7 @@ describe(component.name, () => {
     component.run_id = 'abcd1234'
     component.source_file_name = 'test.csv'
     component.record_type = 'bad'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -55,6 +56,7 @@ describe(component.name, () => {
     component.run_id = ''
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -82,6 +84,7 @@ describe(component.name, () => {
     component.run_id = 'NEW'
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -110,6 +113,7 @@ describe(component.name, () => {
     component.run_id = 'zzzzzzzz'
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -137,6 +141,7 @@ describe(component.name, () => {
     component.run_id = 'NEW'
     component.source_file_name = 'test.csv'
     component.record_type = ''
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -166,6 +171,7 @@ describe(component.name, () => {
     component.run_id = 'abcd1234'
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
