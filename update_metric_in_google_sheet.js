@@ -26,7 +26,7 @@ export default {
       default: '',
     },
     number_of_items: {
-      type: "number",
+      type: "integer",
       label: "Number of Items",
       description: "How many items there were (i.e. how much to increment the recorded metrics by)",
       optional: true,
