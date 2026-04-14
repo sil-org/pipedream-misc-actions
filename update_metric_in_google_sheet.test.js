@@ -28,6 +28,7 @@ describe(component.name, () => {
     component.run_id = 'abcd1234'
     component.source_file_name = 'test.csv'
     component.record_type = 'bad'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -55,6 +56,7 @@ describe(component.name, () => {
     component.run_id = ''
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -82,6 +84,7 @@ describe(component.name, () => {
     component.run_id = 'NEW'
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -110,6 +113,7 @@ describe(component.name, () => {
     component.run_id = 'zzzzzzzz'
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -137,6 +141,7 @@ describe(component.name, () => {
     component.run_id = 'NEW'
     component.source_file_name = 'test.csv'
     component.record_type = ''
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -166,6 +171,7 @@ describe(component.name, () => {
     component.run_id = 'abcd1234'
     component.source_file_name = 'test.csv'
     component.record_type = 'ICJEs'
+    component.number_of_items = 1
     component.google_sheet_id = googleSheetId
     component.google_service_account_key = googleServiceAccountKey
 
@@ -179,5 +185,37 @@ describe(component.name, () => {
     assert.equal(response.insertedNewRow, false)
     assert.equal(response.runID, component.run_id)
     assert.ok(response.newCount > 0)
+  })
+
+  it('should update by the specified amount', async (testContext) => {
+    const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
+    if (!googleServiceAccountKey) {
+      testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+      return
+    }
+    const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
+    assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+
+    component.run_id = 'abcd1234'
+    component.source_file_name = 'test.csv'
+    component.record_type = 'Invoices'
+    component.number_of_items = 3
+    component.google_sheet_id = googleSheetId
+    component.google_service_account_key = googleServiceAccountKey
+
+    const response = await component.run({
+      steps: { trigger: {} },
+      $: {}
+    })
+
+    console.debug(response)
+    assert.equal(response.error, undefined)
+    assert.equal(response.insertedNewRow, false)
+    assert.equal(response.runID, component.run_id)
+    assert.notEqual(response.previousCount, undefined, 'Did not return previous count')
+    assert.equal(
+      response.newCount - response.previousCount,
+      component.number_of_items
+    )
   })
 })
