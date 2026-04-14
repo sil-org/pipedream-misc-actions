@@ -114,6 +114,7 @@ const updateMetric = async (
 
   let insertedNewRow = false
   let newCount
+  let previousCount
 
   if (runID === 'NEW') {
     if (!fullEventId) {
@@ -165,7 +166,7 @@ const updateMetric = async (
       spreadsheetId: googleSheetId,
       range: cellRange,
     })
-    const previousCount = parseInt((getCellResponse.data.values || [[]])[0][0] || 0)
+    previousCount = parseInt((getCellResponse.data.values || [[]])[0][0] || 0)
     newCount = previousCount + 1
     await sheets.spreadsheets.values.update({
       spreadsheetId: googleSheetId,
@@ -179,6 +180,7 @@ const updateMetric = async (
 
   return {
     insertedNewRow,
+    previousCount,
     newCount,
     runID,
   }
