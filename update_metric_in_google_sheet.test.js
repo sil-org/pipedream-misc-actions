@@ -13,7 +13,10 @@ try {
   }
 }
 
-const { default: component } = await import('./update_metric_in_google_sheet.js')
+const {
+  default: component,
+  calculateUniqueRunID,
+} = await import('./update_metric_in_google_sheet.js')
 
 describe(component.name, () => {
   describe('run', () => {
@@ -249,6 +252,16 @@ describe(component.name, () => {
         response.newCount - response.previousCount,
         component.number_of_items
       )
+    })
+  })
+
+  describe.only('calculateUniqueRunID', () => {
+    it.only('should return the given Run ID if it is not in the list of existing Run IDs', async () => {
+      const givenRunID = 'abcd1234'
+      const existingRunIDs = []
+      const result = calculateUniqueRunID(givenRunID, existingRunIDs)
+
+      assert.equal(result, givenRunID)
     })
   })
 })

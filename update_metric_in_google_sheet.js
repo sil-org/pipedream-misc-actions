@@ -57,6 +57,10 @@ export default {
   },
 }
 
+const calculateUniqueRunID = (givenRunID, existingRunIDs) => {
+  return givenRunID // TEMP
+}
+
 const getColumnLetter = (index) => {
   let letter = ''
   while (index >= 0) {
@@ -203,5 +207,6 @@ const updateMetric = async (
 }
 
 export {
+  calculateUniqueRunID,
   updateMetric,
 }
