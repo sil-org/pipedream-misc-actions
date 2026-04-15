@@ -63,10 +63,11 @@ export default {
  * @return {string}
  */
 const calculateUniqueRunID = (givenRunID, existingRunIDs) => {
-  if (existingRunIDs.includes(givenRunID)) {
-    return givenRunID + '-2'
+  let calculatedRunID = givenRunID
+  for (let i = 2; existingRunIDs.includes(calculatedRunID); i++) {
+    calculatedRunID = givenRunID + '-' + i
   }
-  return givenRunID // TEMP
+  return calculatedRunID
 }
 
 const getColumnLetter = (index) => {

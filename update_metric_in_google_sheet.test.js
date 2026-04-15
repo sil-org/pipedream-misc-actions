@@ -267,9 +267,24 @@ describe(component.name, () => {
     it.only('should return a modified Run ID if the given one is in the list of existing Run IDs', async () => {
       const givenRunID = 'abcd1234'
       const existingRunIDs = ['abcd1234']
+
       const result = calculateUniqueRunID(givenRunID, existingRunIDs)
 
       assert.notEqual(result, givenRunID)
+    })
+
+    it.only('should return a unique Run ID even if the given one and what it would change it to are in the list of existing Run IDs', async () => {
+      const givenRunID = 'abcd1234'
+      const existingRunIDs = ['abcd1234']
+      const nextRunID = calculateUniqueRunID(givenRunID, existingRunIDs)
+      existingRunIDs.push(nextRunID)
+
+      const result = calculateUniqueRunID(givenRunID, existingRunIDs)
+
+      assert.notEqual(result, givenRunID)
+      for (const existingRunID of existingRunIDs) {
+        assert.notEqual(result, existingRunID)
+      }
     })
   })
 })
