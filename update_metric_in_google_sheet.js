@@ -146,11 +146,12 @@ const updateMetric = async (
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: googleSheetId,
-      range: 'B:C',
+      range: 'C:C',
     })
-    const fileNamesAndRunIDs = response.data.values || []
+    const existingRunIdRows = response.data.values || []
+    const existingRunIDs = existingRunIdRows.map(row => row[0])
 
-    runID = fullEventId
+    runID = calculateUniqueRunID(fullEventId, existingRunIDs)
     const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     const values = [
       jobRunDateTime,

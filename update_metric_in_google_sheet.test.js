@@ -163,7 +163,7 @@ describe(component.name, () => {
       assert.equal(response.newCount, undefined)
     })
 
-    it('should add a row and come up with a uniquely-suffixed Run ID if given a repeat "new" Run ID', async (testContext) => {
+    it('should add a row and calculate a unique Run ID if given an existing Run ID when adding a row', async (testContext) => {
       const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
       if (!googleServiceAccountKey) {
         testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
