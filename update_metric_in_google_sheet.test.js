@@ -159,6 +159,37 @@ describe(component.name, () => {
     assert.equal(response.newCount, undefined)
   })
 
+  it.only('should add a row and come up with a uniquely-suffixed Run ID if given a repeat "new" Run ID', async (testContext) => {
+    const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
+    if (!googleServiceAccountKey) {
+      testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+      return
+    }
+    const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
+    assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+
+    component.run_id = 'NEW'
+    component.source_file_name = 'test.csv'
+    component.record_type = ''
+    component.number_of_items = 1
+    component.google_sheet_id = googleSheetId
+    component.google_service_account_key = googleServiceAccountKey
+
+    const existingEventId = 'abcd1234'
+    const response = await component.run({
+      steps: { trigger: { event: { id: existingEventId } } },
+      $: {}
+    })
+
+    console.debug(response)
+    assert.equal(response.error, undefined)
+    assert.ok(response.insertedNewRow)
+    assert.ok(response.runID.startsWith(existingEventId))
+    assert.notEqual(response.runID, existingEventId)
+    assert.notEqual(response.runID, 'NEW')
+    assert.equal(response.newCount, undefined)
+  })
+
   it('should update the existing row if one matches the File Name and Run ID', async (testContext) => {
     const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
     if (!googleServiceAccountKey) {
