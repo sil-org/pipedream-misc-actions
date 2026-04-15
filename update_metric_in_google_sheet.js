@@ -131,6 +131,12 @@ const updateMetric = async (
       return { error: 'No event.id was found/provided (to use as the new Run ID)' }
     }
 
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: 'B:C',
+    })
+    const fileNamesAndRunIDs = response.data.values || []
+
     runID = fullEventId
     const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     const values = [
