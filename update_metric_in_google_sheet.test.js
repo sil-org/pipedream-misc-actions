@@ -263,5 +263,13 @@ describe(component.name, () => {
 
       assert.equal(result, givenRunID)
     })
+
+    it.only('should return a modified Run ID if the given one is in the list of existing Run IDs', async () => {
+      const givenRunID = 'abcd1234'
+      const existingRunIDs = ['abcd1234']
+      const result = calculateUniqueRunID(givenRunID, existingRunIDs)
+
+      assert.notEqual(result, givenRunID)
+    })
   })
 })

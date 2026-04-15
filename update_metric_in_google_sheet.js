@@ -57,7 +57,15 @@ export default {
   },
 }
 
+/**
+ * @param {string} givenRunID
+ * @param {string[]} existingRunIDs
+ * @return {string}
+ */
 const calculateUniqueRunID = (givenRunID, existingRunIDs) => {
+  if (existingRunIDs.includes(givenRunID)) {
+    return givenRunID + '-2'
+  }
   return givenRunID // TEMP
 }
 
