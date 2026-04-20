@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "0.2.1",
+  version: "0.2.2",
   type: "action",
 
   props: {
@@ -55,6 +55,19 @@ export default {
       steps?.trigger?.event?.id,
     )
   },
+}
+
+/**
+ * @param {string} givenRunID
+ * @param {string[]} existingRunIDs
+ * @return {string}
+ */
+const calculateUniqueRunID = (givenRunID, existingRunIDs) => {
+  let calculatedRunID = givenRunID
+  for (let i = 2; existingRunIDs.includes(calculatedRunID); i++) {
+    calculatedRunID = givenRunID + '-' + i
+  }
+  return calculatedRunID
 }
 
 const getColumnLetter = (index) => {
@@ -131,7 +144,14 @@ const updateMetric = async (
       return { error: 'No event.id was found/provided (to use as the new Run ID)' }
     }
 
-    runID = fullEventId
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: 'C:C',
+    })
+    const existingRunIdRows = response.data.values || []
+    const existingRunIDs = existingRunIdRows.map(row => row[0])
+
+    runID = calculateUniqueRunID(fullEventId, existingRunIDs)
     const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     const values = [
       jobRunDateTime,
@@ -197,5 +217,6 @@ const updateMetric = async (
 }
 
 export {
+  calculateUniqueRunID,
   updateMetric,
 }
