@@ -41,4 +41,26 @@ describe(component.name, () => {
 
     assert.equal(returnValue, true)
   })
+
+  it('should throw an error if not given any headers', async () => {
+    const headers = {}
+    const context = { 'test': false } // `test: false` means not in build mode.
+
+    let errorThrown
+    try {
+      const returnValue = await component.run({
+        steps: { trigger: { event: { headers } } },
+        $: { context }
+      })
+    } catch (error) {
+      errorThrown = error
+      console.log('Correctly threw an error when given no headers:', error)
+    }
+
+    assert.notEqual(
+      errorThrown,
+      undefined,
+      'Failed to throw an error when given no headers'
+    )
+  })
 })
