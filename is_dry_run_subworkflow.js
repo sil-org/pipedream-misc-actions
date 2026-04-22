@@ -1,6 +1,6 @@
 export default {
   name: "Is Dry Run? (Sub-workflow)",
-  description: "Detect whether this is a dry-run",
+  description: "Detect whether this is a dry-run (based on webhook headers)",
   key: "is-dry-run-subworkflow",
   version: "0.1.0",
   type: "action",
