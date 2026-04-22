@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict'
-
 export default {
   name: "Is Production? (Sub-workflows)",
   description: "Safely determine whether we should run in production or develop mode.",
