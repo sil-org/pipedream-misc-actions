@@ -1,6 +1,6 @@
 export default {
   name: "Is Production? (Sub-workflows)",
-  description: "Safely determine whether we should run in production or develop mode.",
+  description: "Safely determine whether this sub-workflow should run in production or develop mode.",
   key: "is-prod-subworkflow",
   version: "0.1.0",
   type: "action",
