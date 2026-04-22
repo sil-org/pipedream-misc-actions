@@ -6,9 +6,21 @@ const {
 } = await import('./is_prod_subworkflow.js')
 
 describe(component.name, () => {
-  it('should return not-prod if in build mode', async () => {
-    const headers = { 'user-agent': 'dummy-value' }
+  it('should return not-prod if in build mode, even with production header', async () => {
+    const headers = { 'x-is-production': 'true' }
     const context = { 'test': true } // `test: true` means build mode.
+
+    const returnValue = await component.run({
+      steps: { trigger: { event: { headers } } },
+      $: { context }
+    })
+
+    assert.equal(returnValue, false)
+  })
+
+  it('should return not-prod if lacking production header, even if not in build mode', async () => {
+    const headers = { 'user-agent': 'dummy-value' }
+    const context = { 'test': false } // `test: false` means not in build mode.
 
     const returnValue = await component.run({
       steps: { trigger: { event: { headers } } },
