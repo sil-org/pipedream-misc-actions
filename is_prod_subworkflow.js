@@ -5,12 +5,17 @@ export default {
   version: "0.1.0",
   type: "action",
 
-  async run({ steps, $ }) {
-    const headers = steps?.trigger?.event?.headers || {}
-    if (Object.keys(headers).length === 0) {
-      console.log('No headers given. Was `steps` undefined? `steps`:', steps)
-      throw new Error('No headers received. Unable to determine whether this is a production run.')
-    }
+  props: {
+    headers: {
+      type: "object",
+      label: "Headers (from webhook event)",
+      description: 'Example: `{{steps.trigger.event.headers}}`',
+    },
+  },
+
+  async run({ $ }) {
+    const headers = this.headers
+
     const headerSaysIsProduction = String(headers['x-is-production']).trim().toLowerCase() === 'true'
     console.log('(headerSaysIsProduction)', headerSaysIsProduction)
 
