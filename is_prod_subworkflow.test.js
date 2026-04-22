@@ -29,4 +29,16 @@ describe(component.name, () => {
 
     assert.equal(returnValue, false)
   })
+
+  it('should return prod if given production header and not in build mode', async () => {
+    const headers = { 'x-is-production': 'true' }
+    const context = { 'test': false } // `test: false` means not in build mode.
+
+    const returnValue = await component.run({
+      steps: { trigger: { event: { headers } } },
+      $: { context }
+    })
+
+    assert.equal(returnValue, true)
+  })
 })
