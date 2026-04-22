@@ -14,3 +14,4 @@ A collection of custom Pipedream actions
 8. Create CSV Base64 - Create a base64-encoded CSV file from data array input
 9. Retrigger Workflow - Start a recursive call to the same workflow
 10. Update Metric in Google Sheet - Add/Update row to increment count of records processed (by file, run ID, and type)
+11. Is Dry Run - Toggle whether to run a workflow as a dry-run
