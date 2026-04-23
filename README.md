@@ -14,7 +14,7 @@ A collection of custom Pipedream actions
 8. Create CSV Base64 - Create a base64-encoded CSV file from data array input
 9. Retrigger Workflow - Start a recursive call to the same workflow
 10. Update Metric in Google Sheet - Add/Update row to increment count of records processed (by file, run ID, and type)
-11. Is Dry Run - Toggle whether to run a workflow as a dry-run
+11. Is Dry Run (Dispatcher) - Toggle whether to run a workflow as a dry-run
 12. Is Prod (Sub-workflows) - Safely determine whether a sub-workflow should run in production or develop mode
 13. Is Prod (Dispatcher) - Determine whether a dispatcher workflow should run in production or develop mode
 14. Is Dry Run (Sub-workflows) - Detect whether this is a dry-run (based on webhook headers)
