@@ -19,7 +19,6 @@ export default {
       label: "PROD Data Store",
       description:
         "The PROD datastore that will be used to determine whether another call is needed.",
-      optional: true,
     },
     is_prod: {
       type: "boolean",
