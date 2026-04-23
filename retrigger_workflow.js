@@ -27,7 +27,7 @@ export default {
     },
     headers: {
       type: "object",
-      description: "Example: `{{steps.event.headers}}`"
+      description: "Example: `{{steps.trigger.event.headers}}`"
     },
     headers_to_pass_through: {
       type: "string[]",
