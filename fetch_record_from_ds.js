@@ -1,12 +1,24 @@
 export default defineComponent({
-  name: "Fetch Record from Datastore",
-  description: "Fetch Record from Datastore",
+  name: "Fetch Record from Data Store",
+  description: "Fetch Record from Data Store (DEV or PROD, as appropriate)",
   key: "fetch_datastore_record",
-  version: "0.0.5",
+  version: "0.1.0",
   type: "action",
+  
   props: {
-    dataQueue: {
+    devDataQueue: {
+      label: "DEV Data Store queue",
       type: "data_store",
+    },
+    prodDataQueue: {
+      label: "PROD Data Store queue",
+      type: "data_store",
+    },
+    isProd: {
+      label: "Is this a PROD run?",
+      type: "boolean",
+      optional: true,
+      default: false,
     },
   },
 
@@ -14,12 +26,13 @@ export default defineComponent({
     const MAX_DURATION_MS = 100000
     const start = Date.now()
     let attempt = 0
+    const dataQueue = this.isProd ? this.prodDataQueue : this.devDataQueue
 
     while (true){
       try {
         attempt++
         // Access your Data Store via the prop
-        const keys = await this.dataQueue.keys();
+        const keys = await dataQueue.keys();
         if (keys.length == 0) {
           console.log("Data store is empty. Ending Subworkflow")
           $.flow.exit()
@@ -29,10 +42,10 @@ export default defineComponent({
         const key = keys.pop();
 
         // get record from data store
-        const record = await this.dataQueue.get(key);
+        const record = await dataQueue.get(key);
 
         // remove record from data store
-        await this.dataQueue.delete(key);
+        await dataQueue.delete(key);
 
         console.log('Fetched record:', JSON.stringify(record) );
 
