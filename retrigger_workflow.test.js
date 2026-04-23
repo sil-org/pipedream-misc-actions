@@ -15,7 +15,9 @@ describe("Retrigger Workflow", () => {
 
     component.datastore = mockDatastore;
     component.workflow_url = "https://example.com/workflow";
-    component.authorization = "Bearer test-token";
+    component.headers = {
+      authorization: "Bearer test-token",
+    };
     component.current_key = "different-key";
 
     await component.run({ steps: {}, $: {} });
