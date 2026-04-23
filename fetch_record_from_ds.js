@@ -2,7 +2,7 @@ export default defineComponent({
   name: "Fetch Record from Datastore",
   description: "Fetch Record from Datastore",
   key: "fetch_datastore_record",
-  version: "0.0.4",
+  version: "0.0.5",
   type: "action",
   props: {
     dataQueue: {
