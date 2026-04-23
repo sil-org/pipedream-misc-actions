@@ -27,6 +27,7 @@ export default {
     },
     headers: {
       type: "object",
+      label: "Headers (from webhook event)",
       description: "Example: `{{steps.trigger.event.headers}}`"
     },
     headers_to_pass_through: {
