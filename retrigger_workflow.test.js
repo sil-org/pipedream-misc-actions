@@ -3,8 +3,8 @@ import { describe, it } from "node:test";
 
 const { default: component } = await import("./retrigger_workflow.js");
 
-describe.only("Retrigger Workflow", () => {
-  it.only("should call workflow when datastore has keys", async () => {
+describe("Retrigger Workflow", () => {
+  it("should call workflow when datastore has keys", async () => {
     globalThis.__axiosCalls = [];
 
     const mockDatastore = {
@@ -29,7 +29,7 @@ describe.only("Retrigger Workflow", () => {
     );
   });
 
-  it.only("should not call workflow when no keys remain", async () => {
+  it("should not call workflow when no keys remain", async () => {
     globalThis.__axiosCalls = [];
 
     const mockDatastore = {
@@ -46,7 +46,7 @@ describe.only("Retrigger Workflow", () => {
     assert.equal(globalThis.__axiosCalls.length, 0);
   });
 
-  it.only("should throw error on infinite loop detection", async () => {
+  it("should throw error on infinite loop detection", async () => {
     const mockDatastore = {
       async keys() {
         return ["key-1", "loop-key", "key-2"];
