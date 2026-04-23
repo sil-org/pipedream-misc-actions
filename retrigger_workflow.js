@@ -4,15 +4,29 @@ export default {
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "0.2.0",
+  version: "0.3.0",
   type: "action",
 
   props: {
-    datastore: {
+    dev_datastore: {
       type: "data_store",
-      label: "Datastore",
+      label: "DEV Data Store",
       description:
-        "The datastore that will be used to determine whether another call is needed.",
+        "The DEV datastore that will be used to determine whether another call is needed.",
+    },
+    prod_datastore: {
+      type: "data_store",
+      label: "PROD Data Store",
+      description:
+        "The PROD datastore that will be used to determine whether another call is needed.",
+      optional: true,
+    },
+    is_prod: {
+      type: "boolean",
+      label: "Is this a PROD run?",
+      description: "Whether this is a PROD run (and so, which Data Store to use)",
+      optional: true,
+      default: false,
     },
     workflow_url: {
       type: "string",
@@ -38,12 +52,17 @@ export default {
   },
   async run({ steps, $ }) {
     const {
-      datastore,
+      dev_datastore,
+      prod_datastore,
+      is_prod,
       workflow_url,
       current_key,
       headers,
       headers_to_pass_through,
     } = this
+
+    const datastore = is_prod ? prod_datastore : dev_datastore;
+    console.log('Is prod?', is_prod)
 
     const keys = await datastore.keys();
 

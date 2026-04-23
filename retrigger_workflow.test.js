@@ -13,11 +13,12 @@ describe("Retrigger Workflow", () => {
       },
     };
 
-    component.datastore = mockDatastore;
+    component.dev_datastore = mockDatastore;
     component.workflow_url = "https://example.com/workflow";
     component.headers = {
       authorization: "Bearer test-token",
     };
+    component.is_prod = false;
     component.current_key = "different-key";
 
     await component.run({ steps: {}, $: {} });
@@ -29,16 +30,49 @@ describe("Retrigger Workflow", () => {
     );
   });
 
-  it("should not call workflow when no keys remain", async () => {
+  it("should not call workflow when no DEV keys remain (for not-prod)", async () => {
     globalThis.__axiosCalls = [];
 
-    const mockDatastore = {
+    const mockDevDataStore = {
       async keys() {
         return [];
       },
     };
 
-    component.datastore = mockDatastore;
+    const mockProdDataStore = {
+      async keys() {
+        return ["key2", "key3"];
+      },
+    };
+
+    component.dev_datastore = mockDevDataStore;
+    component.prod_datastore = mockProdDataStore;
+    component.is_prod = false;
+    component.current_key = "key1";
+
+    await component.run({ steps: {}, $: {} });
+
+    assert.equal(globalThis.__axiosCalls.length, 0);
+  });
+
+  it("should not call workflow when no PROD keys remain (for prod)", async () => {
+    globalThis.__axiosCalls = [];
+
+    const mockDevDataStore = {
+      async keys() {
+        return ["key2", "key3"];
+      },
+    };
+
+    const mockProdDataStore = {
+      async keys() {
+        return [];
+      },
+    };
+
+    component.dev_datastore = mockDevDataStore;
+    component.prod_datastore = mockProdDataStore;
+    component.is_prod = true;
     component.current_key = "key1";
 
     await component.run({ steps: {}, $: {} });
@@ -53,7 +87,8 @@ describe("Retrigger Workflow", () => {
       },
     };
 
-    component.datastore = mockDatastore;
+    component.dev_datastore = mockDatastore;
+    component.is_prod = false;
     component.current_key = "loop-key";
 
     await assert.rejects(async () => {
@@ -70,7 +105,7 @@ describe("Retrigger Workflow", () => {
       },
     };
 
-    component.datastore = mockDatastore;
+    component.dev_datastore = mockDatastore;
     component.workflow_url = "https://example.com/workflow";
     component.headers = {
       authorization: "Bearer test-token",
@@ -81,6 +116,7 @@ describe("Retrigger Workflow", () => {
       'authorization',
       'x-is-production',
     ]
+    component.is_prod = false;
     component.current_key = "different-key";
 
     await component.run({ steps: {}, $: {} });
