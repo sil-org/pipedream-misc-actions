@@ -37,7 +37,13 @@ export default {
     },
   },
   async run({ steps, $ }) {
-    const {datastore, workflow_url, authorization, current_key, headers, headers_to_pass_through} = this
+    const {
+      datastore,
+      workflow_url,
+      current_key,
+      headers,
+      headers_to_pass_through,
+    } = this
 
     const keys = await datastore.keys();
 
