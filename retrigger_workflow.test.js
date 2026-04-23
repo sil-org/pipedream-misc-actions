@@ -85,8 +85,6 @@ describe("Retrigger Workflow", () => {
 
     await component.run({ steps: {}, $: {} });
 
-    console.debug(globalThis.__axiosCalls)
-
     assert.equal(globalThis.__axiosCalls.length, 1);
     assert.equal(
       globalThis.__axiosCalls[0].url,
