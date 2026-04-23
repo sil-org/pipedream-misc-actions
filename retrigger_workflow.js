@@ -53,10 +53,10 @@ export default {
       );
     }
 
-    // Clean up headers by deleting unspecified fields
-    for (const key in headers) {
-      if (headers_to_pass_through.some(header => header.toLowerCase() === key.toLowerCase())) {
-        delete headers[key];
+    const headersForRetriggerCall = {}
+    for (const headerName in headers) {
+      if (headers_to_pass_through?.includes(headerName)) {
+        headersForRetriggerCall[headerName] = headers[headerName]
       }
     }
 
@@ -64,7 +64,7 @@ export default {
       await axios($, {
         url: workflow_url,
         method: "GET",
-        headers,
+        headers: headersForRetriggerCall,
       });
     }
   },
