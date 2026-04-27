@@ -4,7 +4,7 @@ export default {
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "1.0.0",
+  version: "1.0.1",
   type: "action",
 
   props: {
@@ -80,6 +80,7 @@ export default {
       }
     }
 
+    console.log('Remaining keys:', keys.length)
     if (keys.length > 0) {
       const response = await axios($, {
         url: workflow_url,
