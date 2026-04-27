@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 const { default: component } = await import("./retrigger_workflow.js");
 
-describe.only("Retrigger Workflow", () => {
+describe("Retrigger Workflow", () => {
   it("should call workflow when datastore has keys", async () => {
     globalThis.__axiosCalls = [];
 
@@ -96,7 +96,7 @@ describe.only("Retrigger Workflow", () => {
     }, /Infinite loop detected/);
   });
 
-  it.only("should pass through only the specified headers (case-insensitive)", async () => {
+  it("should pass through only the specified headers (case-insensitive)", async () => {
     globalThis.__axiosCalls = [];
 
     const mockDatastore = {
