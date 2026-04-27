@@ -4,7 +4,7 @@ export default {
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "0.3.1",
+  version: "0.3.2",
   type: "action",
 
   props: {
