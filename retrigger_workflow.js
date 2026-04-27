@@ -4,7 +4,7 @@ export default {
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "0.3.3",
+  version: "1.0.0",
   type: "action",
 
   props: {
@@ -23,9 +23,7 @@ export default {
     is_prod: {
       type: "boolean",
       label: "Is this a PROD run?",
-      description: "Whether this is a PROD run (and so, which Data Store to use)",
-      optional: true,
-      default: false,
+      description: "Whether this is a PROD run (and so, which Data Store to use). Example: `{{steps.Is_Prod.$return_value}}`",
     },
     workflow_url: {
       type: "string",
@@ -49,7 +47,7 @@ export default {
       description: "`authorization` header is recommended at least (case-insensitive)",
     },
   },
-  async run({ steps, $ }) {
+  async run({ $ }) {
     const {
       dev_datastore,
       prod_datastore,
@@ -77,16 +75,18 @@ export default {
     for (const headerName in headers) {
       const lowerCaseHeaderName = toLowerCase(headerName)
       if (lowerCaseHeadersToPassThrough.includes(lowerCaseHeaderName)) {
+        console.log('Passing through header', headerName)
         headersForRetriggerCall[headerName] = headers[headerName]
       }
     }
 
     if (keys.length > 0) {
-      await axios($, {
+      const response = await axios($, {
         url: workflow_url,
         method: "POST",
         headers: headersForRetriggerCall,
       });
+      console.log('Response:', response)
     }
   },
 };
