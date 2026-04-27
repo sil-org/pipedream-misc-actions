@@ -4,7 +4,7 @@ export default {
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "0.3.2",
+  version: "0.3.3",
   type: "action",
 
   props: {
@@ -84,7 +84,7 @@ export default {
     if (keys.length > 0) {
       await axios($, {
         url: workflow_url,
-        method: "GET",
+        method: "POST",
         headers: headersForRetriggerCall,
       });
     }

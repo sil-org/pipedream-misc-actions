@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 const { default: component } = await import("./retrigger_workflow.js");
 
 describe("Retrigger Workflow", () => {
-  it("should call workflow when datastore has keys", async () => {
+  it("should call workflow (as POST) when datastore has keys", async () => {
     globalThis.__axiosCalls = [];
 
     const mockDatastore = {
@@ -24,6 +24,7 @@ describe("Retrigger Workflow", () => {
     await component.run({ steps: {}, $: {} });
 
     assert.equal(globalThis.__axiosCalls.length, 1);
+    assert.equal(globalThis.__axiosCalls[0].method, 'POST');
     assert.equal(
       globalThis.__axiosCalls[0].url,
       "https://example.com/workflow",
