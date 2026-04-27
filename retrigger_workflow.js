@@ -46,7 +46,7 @@ export default {
     headers_to_pass_through: {
       type: "string[]",
       label: "Headers to Pass Through to Retriggered Workflow",
-      description: "`authorization` header is recommended at least",
+      description: "`authorization` header is recommended at least (case-insensitive)",
     },
   },
   async run({ steps, $ }) {
@@ -57,7 +57,6 @@ export default {
       workflow_url,
       current_key,
       headers,
-      headers_to_pass_through,
     } = this
 
     const datastore = is_prod ? prod_datastore : dev_datastore;
@@ -71,9 +70,13 @@ export default {
       );
     }
 
+    const headersToPassThrough = this.headers_to_pass_through || []
+    const lowerCaseHeadersToPassThrough = headersToPassThrough.map(toLowerCase)
+
     const headersForRetriggerCall = {}
     for (const headerName in headers) {
-      if (headers_to_pass_through?.includes(headerName)) {
+      const lowerCaseHeaderName = toLowerCase(headerName)
+      if (lowerCaseHeadersToPassThrough.includes(lowerCaseHeaderName)) {
         headersForRetriggerCall[headerName] = headers[headerName]
       }
     }
@@ -87,3 +90,5 @@ export default {
     }
   },
 };
+
+const toLowerCase = value => String(value).toLowerCase()
