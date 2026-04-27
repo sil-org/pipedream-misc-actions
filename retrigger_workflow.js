@@ -81,11 +81,12 @@ export default {
     }
 
     if (keys.length > 0) {
-      await axios($, {
+      const response = await axios($, {
         url: workflow_url,
         method: "POST",
         headers: headersForRetriggerCall,
       });
+      console.log('Response:', response)
     }
   },
 };
