@@ -23,9 +23,7 @@ export default {
     is_prod: {
       type: "boolean",
       label: "Is this a PROD run?",
-      description: "Whether this is a PROD run (and so, which Data Store to use)",
-      optional: true,
-      default: false,
+      description: "Whether this is a PROD run (and so, which Data Store to use). Example: `{{steps.Is_Prod.$return_value}}`",
     },
     workflow_url: {
       type: "string",
