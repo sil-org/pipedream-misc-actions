@@ -47,7 +47,7 @@ export default {
       description: "`authorization` header is recommended at least (case-insensitive)",
     },
   },
-  async run({ steps, $ }) {
+  async run({ $ }) {
     const {
       dev_datastore,
       prod_datastore,
