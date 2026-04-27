@@ -75,6 +75,7 @@ export default {
     for (const headerName in headers) {
       const lowerCaseHeaderName = toLowerCase(headerName)
       if (lowerCaseHeadersToPassThrough.includes(lowerCaseHeaderName)) {
+        console.log('Passing through header', headerName)
         headersForRetriggerCall[headerName] = headers[headerName]
       }
     }
