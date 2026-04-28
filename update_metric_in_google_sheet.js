@@ -63,10 +63,10 @@ export default {
  * @param {string} recordType
  * @param sheets
  * @param {string} googleSheetId
+ * @param {Array} headers
  * @return {Promise<number>}
  */
-const addColumnFor = async (recordType, sheets, googleSheetId) => {
-  const headers = await getHeaderRow(sheets, googleSheetId)
+const addColumnFor = async (recordType, sheets, googleSheetId, headers) => {
   const newColumnIndex = headers.length
   headers.push(recordType)
 
@@ -210,14 +210,12 @@ const updateMetric = async (
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
 
-    let colIndexForRecordType = await getIndexOfColumnFor(
-      recordType,
-      sheets,
-      googleSheetId
-    )
+    const headers = await getHeaderRow(sheets, googleSheetId)
+    let colIndexForRecordType = headers.indexOf(recordType)
+
     if (colIndexForRecordType === -1) {
-      warnings.push(`No column found for record type: ${recordType}. Adding as a new column.`)
-      colIndexForRecordType = await addColumnFor(recordType, sheets, googleSheetId)
+      warnings.push(`No column found for record type "${recordType}". Adding as a new column.`)
+      colIndexForRecordType = await addColumnFor(recordType, sheets, googleSheetId, headers)
       insertedNewColumn = true
     }
 
