@@ -66,11 +66,7 @@ export default {
  * @return {Promise<number>}
  */
 const addColumnFor = async (recordType, sheets, googleSheetId) => {
-  const headerRes = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-  })
-  const headers = (headerRes.data.values || [])[0] || []
+  const headers = await getHeaderRow(sheets, googleSheetId)
   const newColumnIndex = headers.length
   headers.push(recordType)
 
@@ -108,6 +104,14 @@ const getColumnLetter = (index) => {
   return letter
 }
 
+const getHeaderRow = async (sheets, googleSheetId) => {
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId: googleSheetId,
+    range: '1:1',
+  })
+  return (headerRes.data.values || [])[0] || []
+}
+
 /**
  * Find which column (in the header row) is for the given type of record.
  *
@@ -117,11 +121,7 @@ const getColumnLetter = (index) => {
  * @return {Promise<number>}
  */
 const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
-  const headerRes = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-  })
-  const headers = (headerRes.data.values || [])[0] || []
+  const headers = await getHeaderRow(sheets, googleSheetId)
   return headers.indexOf(recordType)
 }
 
