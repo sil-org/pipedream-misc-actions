@@ -1,4 +1,4 @@
-import { google } from 'googleapis@^144'
+import { google } from 'googleapis@^171'
 
 export default {
   name: "Update Metric (Google Sheet)",
