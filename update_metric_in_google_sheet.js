@@ -65,8 +65,25 @@ export default {
  * @param {string} googleSheetId
  * @return {Promise<number>}
  */
-const addColumnFor = (recordType, sheets, googleSheetId) => {
+const addColumnFor = async (recordType, sheets, googleSheetId) => {
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId: googleSheetId,
+    range: '1:1',
+  })
+  const headers = (headerRes.data.values || [])[0] || []
+  const newColumnIndex = headers.length
+  headers.push(recordType)
 
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: googleSheetId,
+    range: '1:1',
+    valueInputOption: 'USER_ENTERED',
+    resource: {
+      values: [headers]
+    }
+  })
+
+  return newColumnIndex
 }
 
 /**
@@ -200,7 +217,8 @@ const updateMetric = async (
     )
     if (colIndexForRecordType === -1) {
       warnings.push(`No column found for record type: ${recordType}. Adding as a new column.`)
-      colIndexForRecordType = addColumnFor(recordType, sheets)
+      colIndexForRecordType = await addColumnFor(recordType, sheets, googleSheetId)
+      insertedNewColumn = true
     }
 
     const rowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
