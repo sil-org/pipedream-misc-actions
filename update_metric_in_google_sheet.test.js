@@ -163,6 +163,64 @@ describe(component.name, () => {
       assert.equal(response.newCount, undefined)
     })
 
+    it('should indicate that it was a dry run (when adding a new row during a dry run)', async (testContext) => {
+      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
+      if (!googleServiceAccountKey) {
+        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+        return
+      }
+      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
+      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+
+      component.run_id = 'NEW'
+      component.was_dry_run = true
+      component.source_file_name = 'test.csv'
+      component.record_type = ''
+      component.number_of_items = 1
+      component.google_sheet_id = googleSheetId
+      component.google_service_account_key = googleServiceAccountKey
+
+      const exampleEventId = randomUUID()
+      const response = await component.run({
+        steps: { trigger: { event: { id: exampleEventId } } },
+        $: {}
+      })
+
+      console.debug(response)
+      assert.equal(response.error, undefined)
+      assert.ok(response.insertedNewRow)
+      assert.equal(response.dryRun, 'Yes')
+    })
+
+    it('should indicate that it was not a dry run (when adding a new row during a non-dry-run)', async (testContext) => {
+      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
+      if (!googleServiceAccountKey) {
+        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
+        return
+      }
+      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
+      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+
+      component.run_id = 'NEW'
+      component.was_dry_run = false
+      component.source_file_name = 'test.csv'
+      component.record_type = ''
+      component.number_of_items = 1
+      component.google_sheet_id = googleSheetId
+      component.google_service_account_key = googleServiceAccountKey
+
+      const exampleEventId = randomUUID()
+      const response = await component.run({
+        steps: { trigger: { event: { id: exampleEventId } } },
+        $: {}
+      })
+
+      console.debug(response)
+      assert.equal(response.error, undefined)
+      assert.ok(response.insertedNewRow)
+      assert.equal(response.dryRun, 'No')
+    })
+
     it('should add a row and calculate a unique Run ID if given an existing Run ID when adding a row', async (testContext) => {
       const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
       if (!googleServiceAccountKey) {
