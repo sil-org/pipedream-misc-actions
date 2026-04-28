@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "0.2.2",
+  version: "0.2.3",
   type: "action",
 
   props: {
@@ -58,6 +58,31 @@ export default {
 }
 
 /**
+ * Add a column for the given record type and return the new column's index.
+ *
+ * @param {string} recordType
+ * @param sheets
+ * @param {string} googleSheetId
+ * @param {Array} headers
+ * @return {Promise<number>}
+ */
+const addColumnFor = async (recordType, sheets, googleSheetId, headers) => {
+  const newColumnIndex = headers.length
+  headers.push(recordType)
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: googleSheetId,
+    range: '1:1',
+    valueInputOption: 'USER_ENTERED',
+    resource: {
+      values: [headers]
+    }
+  })
+
+  return newColumnIndex
+}
+
+/**
  * @param {string} givenRunID
  * @param {string[]} existingRunIDs
  * @return {string}
@@ -79,21 +104,12 @@ const getColumnLetter = (index) => {
   return letter
 }
 
-/**
- * Find which column (in the header row) is for the given type of record.
- *
- * @param {string} recordType
- * @param sheets
- * @param {string} googleSheetId
- * @return {Promise<number>}
- */
-const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
+const getHeaderRow = async (sheets, googleSheetId) => {
   const headerRes = await sheets.spreadsheets.values.get({
     spreadsheetId: googleSheetId,
     range: '1:1',
   })
-  const headers = (headerRes.data.values || [])[0] || []
-  return headers.indexOf(recordType)
+  return (headerRes.data.values || [])[0] || []
 }
 
 /**
@@ -135,9 +151,11 @@ const updateMetric = async (
   })
   const sheets = google.sheets({ version: 'v4', auth })
 
+  let insertedNewColumn = false
   let insertedNewRow = false
   let newCount
   let previousCount
+  let warnings = []
 
   if (runID === 'NEW') {
     if (!fullEventId) {
@@ -179,13 +197,13 @@ const updateMetric = async (
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
 
-    const colIndexForRecordType = await getIndexOfColumnFor(
-      recordType,
-      sheets,
-      googleSheetId
-    )
+    const headers = await getHeaderRow(sheets, googleSheetId)
+    let colIndexForRecordType = headers.indexOf(recordType)
+
     if (colIndexForRecordType === -1) {
-      return { error: `No column found for record type: ${recordType}` }
+      warnings.push(`No column found for record type "${recordType}". Adding as a new column.`)
+      colIndexForRecordType = await addColumnFor(recordType, sheets, googleSheetId, headers)
+      insertedNewColumn = true
     }
 
     const rowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
@@ -209,10 +227,12 @@ const updateMetric = async (
   }
 
   return {
+    insertedNewColumn,
     insertedNewRow,
     previousCount,
     newCount,
     runID,
+    warnings,
   }
 }
 
