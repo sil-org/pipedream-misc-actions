@@ -20,7 +20,7 @@ const {
 
 describe(component.name, () => {
   describe('run', () => {
-    it('should report an error if no column is found for that record type', async (testContext) => {
+    it('should add a column if no column is found for that record type', async (testContext) => {
       const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
       if (!googleServiceAccountKey) {
         testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
@@ -31,7 +31,7 @@ describe(component.name, () => {
 
       component.run_id = 'abcd1234'
       component.source_file_name = 'test.csv'
-      component.record_type = 'bad'
+      component.record_type = Math.random() + ' Lines'
       component.number_of_items = 1
       component.google_sheet_id = googleSheetId
       component.google_service_account_key = googleServiceAccountKey
@@ -42,10 +42,13 @@ describe(component.name, () => {
       })
 
       console.debug(response)
+      assert.equal(response.error, undefined)
       assert.ok(
-        String(response.error).includes('No column found for'),
-        'Expected an error that no column was found for that record type'
+        String(response.warnings?.join("\n")).includes('No column found for'),
+        'Expected a warning that no column was found for that record type'
       )
+      assert.ok(response.insertedNewColumn)
+      assert.equal(response.newCount, 1)
     })
 
     it('should report an error if not given a Run ID (nor told to generate a new one)', async (testContext) => {
