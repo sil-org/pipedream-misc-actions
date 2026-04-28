@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "0.2.2",
+  version: "0.2.3",
   type: "action",
 
   props: {
