@@ -113,19 +113,6 @@ const getHeaderRow = async (sheets, googleSheetId) => {
 }
 
 /**
- * Find which column (in the header row) is for the given type of record.
- *
- * @param {string} recordType
- * @param sheets
- * @param {string} googleSheetId
- * @return {Promise<number>}
- */
-const getIndexOfColumnFor = async (recordType, sheets, googleSheetId) => {
-  const headers = await getHeaderRow(sheets, googleSheetId)
-  return headers.indexOf(recordType)
-}
-
-/**
  * @param {string} sourceFileName
  * @param {string} runID
  * @param {string} recordType
