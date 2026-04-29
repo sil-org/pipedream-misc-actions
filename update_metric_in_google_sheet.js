@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "0.2.3",
+  version: "1.0.0",
   type: "action",
 
   props: {
@@ -17,6 +17,11 @@ export default {
       type: "string",
       label: "Run ID",
       description: "The unique ID for this run (to prevent double-counting when the same file is processed more than once). The Dispatcher should set this to 'NEW' (to add a row with a new Run ID). Sub-workflows should provide the value given them by the Dispatcher."
+    },
+    was_dry_run: {
+      type: "boolean",
+      label: "Was a Dry Run?",
+      description: "Whether this was a dry run (for recording when adding a new row). Example: `{{steps.Is_Dry_Run.$return_value}}`",
     },
     record_type: {
       type: "string",
@@ -48,6 +53,7 @@ export default {
     return await updateMetric(
       this.source_file_name,
       this.run_id,
+      this.was_dry_run,
       this.record_type,
       this.number_of_items,
       this.google_sheet_id,
@@ -115,6 +121,7 @@ const getHeaderRow = async (sheets, googleSheetId) => {
 /**
  * @param {string} sourceFileName
  * @param {string} runID
+ * @param {boolean} wasDryRun
  * @param {string} recordType
  * @param {number} numberOfItems
  * @param {string} googleSheetId
@@ -125,6 +132,7 @@ const getHeaderRow = async (sheets, googleSheetId) => {
 const updateMetric = async (
   sourceFileName,
   runID,
+  wasDryRun,
   recordType,
   numberOfItems,
   googleSheetId,
@@ -151,6 +159,7 @@ const updateMetric = async (
   })
   const sheets = google.sheets({ version: 'v4', auth })
 
+  let dryRun = wasDryRun ? 'Yes' : 'No'
   let insertedNewColumn = false
   let insertedNewRow = false
   let newCount
@@ -175,6 +184,7 @@ const updateMetric = async (
       jobRunDateTime,
       sourceFileName,
       runID,
+      dryRun,
     ]
     await sheets.spreadsheets.values.append({
       spreadsheetId: googleSheetId,
@@ -227,6 +237,7 @@ const updateMetric = async (
   }
 
   return {
+    dryRun,
     insertedNewColumn,
     insertedNewRow,
     previousCount,
