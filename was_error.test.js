@@ -25,4 +25,17 @@ describe(component.name, () => {
     const returnValue = await component.run()
     assert.equal(returnValue, false)
   })
+
+  it('should handle non-boolean truthy values correctly', async () => {
+    const truthyNonBooleanValues = [
+      'asdf',
+      ['a'],
+      2,
+    ]
+    for (const truthyNonBooleanValue of truthyNonBooleanValues) {
+      component.errors = [truthyNonBooleanValue]
+      const returnValue = await component.run()
+      assert.equal(returnValue, true)
+    }
+  })
 })

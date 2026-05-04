@@ -12,6 +12,7 @@ export default {
   },
 
   async run() {
-    return this.errors.includes(true)
+    const booleanValues = this.errors.map(value => Boolean(value))
+    return booleanValues.includes(true)
   },
 }
