@@ -30,6 +30,7 @@ describe(component.name, () => {
     const truthyNonBooleanValues = [
       'asdf',
       ['a'],
+      [],
       2,
     ]
     for (const truthyNonBooleanValue of truthyNonBooleanValues) {
