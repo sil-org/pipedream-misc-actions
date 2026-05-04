@@ -42,4 +42,25 @@ describe(component.name, () => {
       )
     }
   })
+
+  it('should handle non-boolean falsy values correctly', async () => {
+    // For details about "falsy" see the docs:
+    // https://developer.mozilla.org/en-US/docs/Glossary/Falsy
+    const falsyNonBooleanValues = [
+      null,
+      undefined,
+      NaN,
+      0,
+      '',
+    ]
+    for (const falsyNonBooleanValue of falsyNonBooleanValues) {
+      component.errors = [falsyNonBooleanValue]
+      const returnValue = await component.run()
+      assert.equal(
+        returnValue,
+        false,
+        `Failed to treat ${JSON.stringify(falsyNonBooleanValue)} as false.`
+      )
+    }
+  })
 })
