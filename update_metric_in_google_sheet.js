@@ -57,6 +57,8 @@ export default {
     }
   },
   async run() {
+    const googleSheet = new GoogleSheet(this.google_service_account_key, this.google_sheet_id)
+
     return await updateMetric(
       this.source_file_name,
       this.run_id,
@@ -65,6 +67,7 @@ export default {
       this.number_of_items,
       this.google_sheet_id,
       this.google_service_account_key,
+      googleSheet,
       this.event_id,
     )
   },
@@ -171,6 +174,7 @@ const getHeaderRow = async (sheets, googleSheetId) => {
  * @param {number} numberOfItems
  * @param {string} googleSheetId
  * @param {string} googleServiceAccountKey
+ * @param {SpreadsheetInterface} spreadsheet
  * @param {string} eventId
  * @return {Promise<Object>}
  */
@@ -182,6 +186,7 @@ const updateMetric = async (
   numberOfItems,
   googleSheetId,
   googleServiceAccountKey,
+  spreadsheet,
   eventId
 ) => {
   if (!runID) {
