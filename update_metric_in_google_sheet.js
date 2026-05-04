@@ -86,6 +86,13 @@ export default {
  */
 
 /**
+ * @function
+ * @name SpreadsheetInterface#getColumn
+ * @param {string} columnLetter
+ * @returns {Promise<Array<Array>>} -- An array (column) of arrays (cell values in that row)
+ */
+
+/**
  * Google Sheet adapter
  *
  * @constructor
@@ -109,6 +116,14 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
         values: [cellValues]
       }
     })
+  }
+
+  this.getColumn = async (columnLetter) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: columnLetter + ':' + columnLetter,
+    })
+    return response.data.values || []
   }
 }
 
@@ -222,11 +237,7 @@ const updateMetric = async (
       return { error: 'No Event ID was provided (to use in the new Run ID)' }
     }
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: 'C:C',
-    })
-    const existingRunIdRows = response.data.values || []
+    const existingRunIdRows = await spreadsheet.getColumn('C')
     const existingRunIDs = existingRunIdRows.map(row => row[0])
 
     runID = calculateUniqueRunID(eventId, existingRunIDs)
