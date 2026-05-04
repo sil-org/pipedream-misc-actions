@@ -71,6 +71,17 @@ export default {
 }
 
 /**
+ * Interface for interacting with spreadsheets
+ * @interface SpreadsheetInterface
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#appendRow
+ * @param {Array<string>} cellValues
+ */
+
+/**
  * Add a column for the given record type and return the new column's index.
  *
  * @param {string} recordType
