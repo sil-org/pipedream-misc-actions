@@ -82,6 +82,33 @@ export default {
  */
 
 /**
+ * Google Sheet adapter
+ *
+ * @constructor
+ * @param {string} serviceAccountKeyJson
+ * @param {string} spreadsheetId
+ * @implements {SpreadsheetInterface}
+ */
+function GoogleSheet(serviceAccountKeyJson, spreadsheetId) {
+  const auth = new google.auth.GoogleAuth({
+    credentials: JSON.parse(serviceAccountKeyJson),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  })
+  const sheets = google.sheets({ version: 'v4', auth })
+
+  this.appendRow = async (cellValues) => {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: spreadsheetId,
+      range: 'A1',
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: [cellValues]
+      }
+    })
+  }
+}
+
+/**
  * Add a column for the given record type and return the new column's index.
  *
  * @param {string} recordType
