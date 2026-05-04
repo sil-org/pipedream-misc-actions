@@ -35,7 +35,11 @@ describe(component.name, () => {
     for (const truthyNonBooleanValue of truthyNonBooleanValues) {
       component.errors = [truthyNonBooleanValue]
       const returnValue = await component.run()
-      assert.equal(returnValue, true)
+      assert.equal(
+        returnValue,
+        true,
+        `Failed to treat ${JSON.stringify(truthyNonBooleanValue)} as true.`
+      )
     }
   })
 })
