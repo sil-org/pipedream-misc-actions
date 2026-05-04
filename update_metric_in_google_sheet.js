@@ -82,6 +82,7 @@ export default {
  * @function
  * @name SpreadsheetInterface#appendRow
  * @param {Array<string>} cellValues
+ * @returns {Promise}
  */
 
 /**
