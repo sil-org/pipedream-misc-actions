@@ -136,7 +136,7 @@ describe(component.name, () => {
       )
     })
 
-    it('should add a row (and use the event.id as the actual Run ID) if given a Run ID of "NEW"', async (testContext) => {
+    it('should add a row (and use the Event ID as the actual Run ID) if given a Run ID of "NEW"', async (testContext) => {
       const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
       if (!googleServiceAccountKey) {
         testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
@@ -144,6 +144,7 @@ describe(component.name, () => {
       }
       const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
       assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+      const exampleEventId = randomUUID()
 
       component.run_id = 'NEW'
       component.source_file_name = 'test.csv'
@@ -151,12 +152,9 @@ describe(component.name, () => {
       component.number_of_items = 1
       component.google_sheet_id = googleSheetId
       component.google_service_account_key = googleServiceAccountKey
+      component.event_id = exampleEventId
 
-      const exampleEventId = randomUUID()
-      const response = await component.run({
-        steps: { trigger: { event: { id: exampleEventId } } },
-        $: {}
-      })
+      const response = await component.run()
 
       console.debug(response)
       assert.equal(response.error, undefined)
@@ -174,6 +172,7 @@ describe(component.name, () => {
       }
       const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
       assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+      const exampleEventId = randomUUID()
 
       component.run_id = 'NEW'
       component.was_dry_run = true
@@ -182,12 +181,9 @@ describe(component.name, () => {
       component.number_of_items = 1
       component.google_sheet_id = googleSheetId
       component.google_service_account_key = googleServiceAccountKey
+      component.event_id = exampleEventId
 
-      const exampleEventId = randomUUID()
-      const response = await component.run({
-        steps: { trigger: { event: { id: exampleEventId } } },
-        $: {}
-      })
+      const response = await component.run()
 
       console.debug(response)
       assert.equal(response.error, undefined)
@@ -203,6 +199,7 @@ describe(component.name, () => {
       }
       const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
       assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+      const exampleEventId = randomUUID()
 
       component.run_id = 'NEW'
       component.was_dry_run = false
@@ -211,12 +208,9 @@ describe(component.name, () => {
       component.number_of_items = 1
       component.google_sheet_id = googleSheetId
       component.google_service_account_key = googleServiceAccountKey
+      component.event_id = exampleEventId
 
-      const exampleEventId = randomUUID()
-      const response = await component.run({
-        steps: { trigger: { event: { id: exampleEventId } } },
-        $: {}
-      })
+      const response = await component.run()
 
       console.debug(response)
       assert.equal(response.error, undefined)
@@ -232,6 +226,7 @@ describe(component.name, () => {
       }
       const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
       assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+      const existingEventId = 'abcd1234'
 
       component.run_id = 'NEW'
       component.source_file_name = 'test.csv'
@@ -239,12 +234,9 @@ describe(component.name, () => {
       component.number_of_items = 1
       component.google_sheet_id = googleSheetId
       component.google_service_account_key = googleServiceAccountKey
+      component.event_id = existingEventId
 
-      const existingEventId = 'abcd1234'
-      const response = await component.run({
-        steps: { trigger: { event: { id: existingEventId } } },
-        $: {}
-      })
+      const response = await component.run()
 
       console.debug(response)
       assert.equal(response.error, undefined)
