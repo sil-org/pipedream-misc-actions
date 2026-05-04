@@ -90,10 +90,10 @@ export default {
  *
  * @constructor
  * @param {string} serviceAccountKeyJson
- * @param {string} spreadsheetId
+ * @param {string} googleSheetId
  * @implements {SpreadsheetInterface}
  */
-function GoogleSheet(serviceAccountKeyJson, spreadsheetId) {
+function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(serviceAccountKeyJson),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -102,7 +102,7 @@ function GoogleSheet(serviceAccountKeyJson, spreadsheetId) {
 
   this.appendRow = async (cellValues) => {
     await sheets.spreadsheets.values.append({
-      spreadsheetId: spreadsheetId,
+      spreadsheetId: googleSheetId,
       range: 'A1',
       valueInputOption: 'USER_ENTERED',
       resource: {
