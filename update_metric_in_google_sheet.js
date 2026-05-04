@@ -236,14 +236,7 @@ const updateMetric = async (
       runID,
       dryRun,
     ]
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: googleSheetId,
-      range: 'A1',
-      valueInputOption: 'USER_ENTERED',
-      resource: {
-        values: [values]
-      }
-    })
+    await spreadsheet.appendRow(values)
     insertedNewRow = true
   } else {
     const response = await sheets.spreadsheets.values.get({
