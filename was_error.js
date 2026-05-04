@@ -8,6 +8,7 @@ export default {
   props: {
     errors: {
       type: "boolean[]",
+      description: "The error conditions you want to check. Truthy inputs will be treated as `true`. See https://developer.mozilla.org/en-US/docs/Glossary/Truthy for details.",
     }
   },
 
