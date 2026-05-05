@@ -205,14 +205,6 @@ const getColumnLetter = (index) => {
   return letter
 }
 
-const getHeaderRow = async (sheets, googleSheetId) => {
-  const headerRes = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-  })
-  return (headerRes.data.values || [])[0] || []
-}
-
 /**
  * @param {string} sourceFileName
  * @param {string} runID
