@@ -93,6 +93,14 @@ export default {
  */
 
 /**
+ * @function
+ * @name SpreadsheetInterface#getColumns
+ * @param {string} firstColumnLetter
+ * @param {string} lastColumnLetter
+ * @returns {Promise<Array<Array>>} -- A list of rows, each containing the specified columns' cell values for that row. Example (using cell identifiers as values): [['A1', 'B1'], ['A2', 'B2']]
+ */
+
+/**
  * Google Sheet adapter
  *
  * @constructor
@@ -122,6 +130,14 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: googleSheetId,
       range: columnLetter + ':' + columnLetter,
+    })
+    return response.data.values || []
+  }
+
+  this.getColumns = async (firstColumnLetter, lastColumnLetter) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: firstColumnLetter + ':' + lastColumnLetter,
     })
     return response.data.values || []
   }
@@ -251,11 +267,7 @@ const updateMetric = async (
     await spreadsheet.appendRow(values)
     insertedNewRow = true
   } else {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: 'B:C',
-    })
-    const fileNamesAndRunIDs = response.data.values || []
+    const fileNamesAndRunIDs = await spreadsheet.getColumns('B', 'C')
 
     let rowToUpdateIndex = fileNamesAndRunIDs.findIndex(row => row[0] === sourceFileName && row[1] === runID)
     if (rowToUpdateIndex === -1) {
