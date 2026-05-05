@@ -65,8 +65,6 @@ export default {
       this.was_dry_run,
       this.record_type,
       this.number_of_items,
-      this.google_sheet_id,
-      this.google_service_account_key,
       googleSheet,
       this.event_id,
     )
@@ -235,8 +233,6 @@ const getColumnLetter = (index) => {
  * @param {boolean} wasDryRun
  * @param {string} recordType
  * @param {number} numberOfItems
- * @param {string} googleSheetId
- * @param {string} googleServiceAccountKey
  * @param {SpreadsheetInterface} spreadsheet
  * @param {string} eventId
  * @return {Promise<Object>}
@@ -247,8 +243,6 @@ const updateMetric = async (
   wasDryRun,
   recordType,
   numberOfItems,
-  googleSheetId,
-  googleServiceAccountKey,
   spreadsheet,
   eventId
 ) => {
@@ -265,12 +259,6 @@ const updateMetric = async (
       return { error: 'A Record Type is required when updating metrics for a given Run ID' }
     }
   }
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(googleServiceAccountKey),
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  })
-  const sheets = google.sheets({ version: 'v4', auth })
 
   let dryRun = wasDryRun ? 'Yes' : 'No'
   let insertedNewColumn = false
@@ -321,14 +309,7 @@ const updateMetric = async (
     const previousCellValue = await spreadsheet.getCell(cellIdentifier)
     previousCount = parseInt(previousCellValue || 0)
     newCount = previousCount + numberOfItems
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: googleSheetId,
-      range: cellIdentifier,
-      valueInputOption: 'USER_ENTERED',
-      resource: {
-        values: [[newCount]]
-      }
-    })
+    await spreadsheet.update(cellIdentifier, [[newCount]])
   }
 
   return {
