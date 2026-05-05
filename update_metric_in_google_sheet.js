@@ -108,6 +108,14 @@ export default {
  */
 
 /**
+ * @function
+ * @name SpreadsheetInterface#update
+ * @param {string} range (e.g. `'1:1'`)
+ * @param {Array<Array>} values
+ * @returns {Promise}
+ */
+
+/**
  * Google Sheet adapter
  *
  * @constructor
@@ -156,30 +164,31 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
     })
     return (response.data.values || [])[0] || []
   }
+
+  this.update = async (range, values) => {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: googleSheetId,
+      range: range,
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: values,
+      }
+    })
+  }
 }
 
 /**
  * Add a column for the given record type and return the new column's index.
  *
  * @param {string} recordType
- * @param sheets
- * @param {string} googleSheetId
- * @param {Array} headers
+ * @param {SpreadsheetInterface} spreadsheet
+ * @param {Array} headers -- The current array of header values
  * @return {Promise<number>}
  */
-const addColumnFor = async (recordType, sheets, googleSheetId, headers) => {
+const addColumnFor = async (recordType, spreadsheet, headers) => {
   const newColumnIndex = headers.length
   headers.push(recordType)
-
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-    valueInputOption: 'USER_ENTERED',
-    resource: {
-      values: [headers]
-    }
-  })
-
+  await spreadsheet.update('1:1', [headers])
   return newColumnIndex
 }
 
@@ -286,7 +295,7 @@ const updateMetric = async (
 
     if (colIndexForRecordType === -1) {
       warnings.push(`No column found for record type "${recordType}". Adding as a new column.`)
-      colIndexForRecordType = await addColumnFor(recordType, sheets, googleSheetId, headers)
+      colIndexForRecordType = await addColumnFor(recordType, spreadsheet, headers)
       insertedNewColumn = true
     }
 
