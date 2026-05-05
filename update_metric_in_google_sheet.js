@@ -87,6 +87,13 @@ export default {
 
 /**
  * @function
+ * @name SpreadsheetInterface#getCell
+ * @param {string} cellIdentifier -- Example: `'A1'`
+ * @returns {Promise<any>} -- The value of that cell (often as a string)
+ */
+
+/**
+ * @function
  * @name SpreadsheetInterface#getColumn
  * @param {string} columnLetter
  * @returns {Promise<Array<Array>>} -- An array (column) of arrays (cell values in that row)
@@ -174,6 +181,14 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
         values: values,
       }
     })
+  }
+
+  this.getCell = async (cellIdentifier) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: cellIdentifier,
+    })
+    return (response.data.values || [[]])[0][0]
   }
 }
 
@@ -301,17 +316,14 @@ const updateMetric = async (
 
     const rowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
     const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
-    const cellRange = `${columnLetterForRecordType}${rowNumber}`
+    const cellIdentifier = `${columnLetterForRecordType}${rowNumber}`
     
-    const getCellResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: cellRange,
-    })
-    previousCount = parseInt((getCellResponse.data.values || [[]])[0][0] || 0)
+    const previousCellValue = await spreadsheet.getCell(cellIdentifier)
+    previousCount = parseInt(previousCellValue || 0)
     newCount = previousCount + numberOfItems
     await sheets.spreadsheets.values.update({
       spreadsheetId: googleSheetId,
-      range: cellRange,
+      range: cellIdentifier,
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: [[newCount]]
