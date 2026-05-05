@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "1.0.0",
+  version: "2.0.0",
   type: "action",
 
   props: {
@@ -48,8 +48,15 @@ export default {
       description: "The JSON string of the Google Service Account Key",
       secret: true,
     },
+    event_id: {
+      type: "string",
+      label: "Event ID",
+      description: "The Event ID, used for calculating a Run ID when adding a new row. Example: `{{steps.trigger.event.id}}`",
+      optional: true,
+      default: "",
+    }
   },
-  async run({ steps, $ }) {
+  async run() {
     return await updateMetric(
       this.source_file_name,
       this.run_id,
@@ -58,7 +65,7 @@ export default {
       this.number_of_items,
       this.google_sheet_id,
       this.google_service_account_key,
-      steps?.trigger?.event?.id,
+      this.event_id,
     )
   },
 }
@@ -126,7 +133,7 @@ const getHeaderRow = async (sheets, googleSheetId) => {
  * @param {number} numberOfItems
  * @param {string} googleSheetId
  * @param {string} googleServiceAccountKey
- * @param {string} fullEventId
+ * @param {string} eventId
  * @return {Promise<Object>}
  */
 const updateMetric = async (
@@ -137,7 +144,7 @@ const updateMetric = async (
   numberOfItems,
   googleSheetId,
   googleServiceAccountKey,
-  fullEventId
+  eventId
 ) => {
   if (!runID) {
     return { error: 'No Run ID was provided' }
@@ -167,8 +174,8 @@ const updateMetric = async (
   let warnings = []
 
   if (runID === 'NEW') {
-    if (!fullEventId) {
-      return { error: 'No event.id was found/provided (to use as the new Run ID)' }
+    if (!eventId) {
+      return { error: 'No Event ID was provided (to use in the new Run ID)' }
     }
 
     const response = await sheets.spreadsheets.values.get({
@@ -178,7 +185,7 @@ const updateMetric = async (
     const existingRunIdRows = response.data.values || []
     const existingRunIDs = existingRunIdRows.map(row => row[0])
 
-    runID = calculateUniqueRunID(fullEventId, existingRunIDs)
+    runID = calculateUniqueRunID(eventId, existingRunIDs)
     const jobRunDateTime = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     const values = [
       jobRunDateTime,
