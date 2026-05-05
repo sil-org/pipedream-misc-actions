@@ -101,6 +101,13 @@ export default {
  */
 
 /**
+ * @function
+ * @name SpreadsheetInterface#getRow
+ * @param {number} rowNumber
+ * @returns {Promise<Array>} -- An array cell values in that row
+ */
+
+/**
  * Google Sheet adapter
  *
  * @constructor
@@ -140,6 +147,14 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
       range: firstColumnLetter + ':' + lastColumnLetter,
     })
     return response.data.values || []
+  }
+
+  this.getRow = async (rowNumber) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: rowNumber + ':' + rowNumber,
+    })
+    return (response.data.values || [])[0] || []
   }
 }
 
@@ -274,7 +289,7 @@ const updateMetric = async (
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
 
-    const headers = await getHeaderRow(sheets, googleSheetId)
+    const headers = await spreadsheet.getRow(1)
     let colIndexForRecordType = headers.indexOf(recordType)
 
     if (colIndexForRecordType === -1) {
