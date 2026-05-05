@@ -107,6 +107,13 @@ export default {
 
 /**
  * @function
+ * @name SpreadsheetInterface#getRanges
+ * @param {Array<string>} ranges -- Example: `['B:C', '1:1']`
+ * @returns {Promise<Array<Array<Array>>>} -- A list of the results for each range, in the order specified in `ranges`. Each range's results will be a nested array.
+ */
+
+/**
+ * @function
  * @name SpreadsheetInterface#getRow
  * @param {number} rowNumber
  * @returns {Promise<Array>} -- An array cell values in that row
@@ -160,6 +167,14 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
       range: firstColumnLetter + ':' + lastColumnLetter,
     })
     return response.data.values || []
+  }
+
+  this.getRanges = async (ranges) => {
+    const response = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId: googleSheetId,
+      ranges: ranges,
+    })
+    return response.data.valueRanges.map(valueRange => valueRange.values)
   }
 
   this.getRow = async (rowNumber) => {
@@ -286,14 +301,16 @@ const updateMetric = async (
     await spreadsheet.appendRow(values)
     insertedNewRow = true
   } else {
-    const fileNamesAndRunIDs = await spreadsheet.getColumns('B', 'C')
+    const batchedValues = await spreadsheet.getRanges(['B:C', '1:1'])
+    const fileNamesAndRunIDs = batchedValues[0] || []
 
     let rowToUpdateIndex = fileNamesAndRunIDs.findIndex(row => row[0] === sourceFileName && row[1] === runID)
     if (rowToUpdateIndex === -1) {
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
 
-    const headers = await spreadsheet.getRow(1)
+    const headersNestedArray = batchedValues[1] || []
+    const headers = headersNestedArray[0] || []
     let colIndexForRecordType = headers.indexOf(recordType)
 
     if (colIndexForRecordType === -1) {
