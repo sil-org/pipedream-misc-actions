@@ -79,7 +79,7 @@ export default {
 /**
  * @function
  * @name SpreadsheetInterface#appendRow
- * @param {Array<string>} cellValues
+ * @param {Array<(string|number|boolean|null)>} cellValues
  * @returns {Promise}
  */
 
@@ -115,7 +115,7 @@ export default {
 /**
  * @function
  * @name SpreadsheetInterface#update
- * @param {string} range (e.g. `'1:1'`)
+ * @param {string} range The target range to update, such as a row range like `'1:1'` or a single-cell identifier like `'C2'`
  * @param {Array<Array>} values
  * @returns {Promise}
  */
