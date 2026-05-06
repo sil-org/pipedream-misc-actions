@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "2.0.1",
+  version: "2.0.2",
   type: "action",
 
   props: {
@@ -99,17 +99,9 @@ export default {
 
 /**
  * @function
- * @name SpreadsheetInterface#getColumns
- * @param {string} firstColumnLetter
- * @param {string} lastColumnLetter
- * @returns {Promise<Array<Array>>} -- A list of rows, each containing the specified columns' cell values for that row. Example (using cell identifiers as values): [['A1', 'B1'], ['A2', 'B2']]
- */
-
-/**
- * @function
- * @name SpreadsheetInterface#getRow
- * @param {number} rowNumber
- * @returns {Promise<Array>} -- An array cell values in that row
+ * @name SpreadsheetInterface#getRanges
+ * @param {Array<string>} ranges -- Example: `['B:C', '1:1']`
+ * @returns {Promise<Array<Array<Array>>>} -- A list of the results for each range, in the order specified in `ranges`. Each range's results will be a nested array.
  */
 
 /**
@@ -154,20 +146,12 @@ function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
     return response.data.values || []
   }
 
-  this.getColumns = async (firstColumnLetter, lastColumnLetter) => {
-    const response = await sheets.spreadsheets.values.get({
+  this.getRanges = async (ranges) => {
+    const response = await sheets.spreadsheets.values.batchGet({
       spreadsheetId: googleSheetId,
-      range: firstColumnLetter + ':' + lastColumnLetter,
+      ranges: ranges,
     })
-    return response.data.values || []
-  }
-
-  this.getRow = async (rowNumber) => {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: rowNumber + ':' + rowNumber,
-    })
-    return (response.data.values || [])[0] || []
+    return response.data.valueRanges.map(valueRange => valueRange.values)
   }
 
   this.update = async (range, values) => {
@@ -286,14 +270,16 @@ const updateMetric = async (
     await spreadsheet.appendRow(values)
     insertedNewRow = true
   } else {
-    const fileNamesAndRunIDs = await spreadsheet.getColumns('B', 'C')
+    const batchedValues = await spreadsheet.getRanges(['B:C', '1:1'])
+    const fileNamesAndRunIDs = batchedValues[0] || []
 
     let rowToUpdateIndex = fileNamesAndRunIDs.findIndex(row => row[0] === sourceFileName && row[1] === runID)
     if (rowToUpdateIndex === -1) {
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
 
-    const headers = await spreadsheet.getRow(1)
+    const headersNestedArray = batchedValues[1] || []
+    const headers = headersNestedArray[0] || []
     let colIndexForRecordType = headers.indexOf(recordType)
 
     if (colIndexForRecordType === -1) {
