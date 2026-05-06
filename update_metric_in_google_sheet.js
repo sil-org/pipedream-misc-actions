@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "2.0.0",
+  version: "2.0.1",
   type: "action",
 
   props: {
@@ -57,41 +57,151 @@ export default {
     }
   },
   async run() {
+    const googleSheet = new GoogleSheet(this.google_service_account_key, this.google_sheet_id)
+
     return await updateMetric(
       this.source_file_name,
       this.run_id,
       this.was_dry_run,
       this.record_type,
       this.number_of_items,
-      this.google_sheet_id,
-      this.google_service_account_key,
+      googleSheet,
       this.event_id,
     )
   },
 }
 
 /**
+ * Interface for interacting with spreadsheets
+ * @interface SpreadsheetInterface
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#appendRow
+ * @param {Array<(string|number|boolean|null)>} cellValues
+ * @returns {Promise}
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#getCell
+ * @param {string} cellIdentifier -- Example: `'A1'`
+ * @returns {Promise<any>} -- The value of that cell (often as a string)
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#getColumn
+ * @param {string} columnLetter
+ * @returns {Promise<Array<Array>>} -- An array (column) of arrays (cell values in that row)
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#getColumns
+ * @param {string} firstColumnLetter
+ * @param {string} lastColumnLetter
+ * @returns {Promise<Array<Array>>} -- A list of rows, each containing the specified columns' cell values for that row. Example (using cell identifiers as values): [['A1', 'B1'], ['A2', 'B2']]
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#getRow
+ * @param {number} rowNumber
+ * @returns {Promise<Array>} -- An array cell values in that row
+ */
+
+/**
+ * @function
+ * @name SpreadsheetInterface#update
+ * @param {string} range The target range to update, such as a row range like `'1:1'` or a single-cell identifier like `'C2'`
+ * @param {Array<Array>} values
+ * @returns {Promise}
+ */
+
+/**
+ * Google Sheet adapter
+ *
+ * @constructor
+ * @param {string} serviceAccountKeyJson
+ * @param {string} googleSheetId
+ * @implements {SpreadsheetInterface}
+ */
+function GoogleSheet(serviceAccountKeyJson, googleSheetId) {
+  const auth = new google.auth.GoogleAuth({
+    credentials: JSON.parse(serviceAccountKeyJson),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  })
+  const sheets = google.sheets({ version: 'v4', auth })
+
+  this.appendRow = async (cellValues) => {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: googleSheetId,
+      range: 'A1',
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: [cellValues]
+      }
+    })
+  }
+
+  this.getColumn = async (columnLetter) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: columnLetter + ':' + columnLetter,
+    })
+    return response.data.values || []
+  }
+
+  this.getColumns = async (firstColumnLetter, lastColumnLetter) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: firstColumnLetter + ':' + lastColumnLetter,
+    })
+    return response.data.values || []
+  }
+
+  this.getRow = async (rowNumber) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: rowNumber + ':' + rowNumber,
+    })
+    return (response.data.values || [])[0] || []
+  }
+
+  this.update = async (range, values) => {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: googleSheetId,
+      range: range,
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: values,
+      }
+    })
+  }
+
+  this.getCell = async (cellIdentifier) => {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: googleSheetId,
+      range: cellIdentifier,
+    })
+    return (response.data.values || [[]])[0][0]
+  }
+}
+
+/**
  * Add a column for the given record type and return the new column's index.
  *
  * @param {string} recordType
- * @param sheets
- * @param {string} googleSheetId
- * @param {Array} headers
+ * @param {SpreadsheetInterface} spreadsheet
+ * @param {Array} headers -- The current array of header values
  * @return {Promise<number>}
  */
-const addColumnFor = async (recordType, sheets, googleSheetId, headers) => {
+const addColumnFor = async (recordType, spreadsheet, headers) => {
   const newColumnIndex = headers.length
   headers.push(recordType)
-
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-    valueInputOption: 'USER_ENTERED',
-    resource: {
-      values: [headers]
-    }
-  })
-
+  await spreadsheet.update('1:1', [headers])
   return newColumnIndex
 }
 
@@ -117,22 +227,13 @@ const getColumnLetter = (index) => {
   return letter
 }
 
-const getHeaderRow = async (sheets, googleSheetId) => {
-  const headerRes = await sheets.spreadsheets.values.get({
-    spreadsheetId: googleSheetId,
-    range: '1:1',
-  })
-  return (headerRes.data.values || [])[0] || []
-}
-
 /**
  * @param {string} sourceFileName
  * @param {string} runID
  * @param {boolean} wasDryRun
  * @param {string} recordType
  * @param {number} numberOfItems
- * @param {string} googleSheetId
- * @param {string} googleServiceAccountKey
+ * @param {SpreadsheetInterface} spreadsheet
  * @param {string} eventId
  * @return {Promise<Object>}
  */
@@ -142,8 +243,7 @@ const updateMetric = async (
   wasDryRun,
   recordType,
   numberOfItems,
-  googleSheetId,
-  googleServiceAccountKey,
+  spreadsheet,
   eventId
 ) => {
   if (!runID) {
@@ -160,12 +260,6 @@ const updateMetric = async (
     }
   }
 
-  const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(googleServiceAccountKey),
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  })
-  const sheets = google.sheets({ version: 'v4', auth })
-
   let dryRun = wasDryRun ? 'Yes' : 'No'
   let insertedNewColumn = false
   let insertedNewRow = false
@@ -178,11 +272,7 @@ const updateMetric = async (
       return { error: 'No Event ID was provided (to use in the new Run ID)' }
     }
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: 'C:C',
-    })
-    const existingRunIdRows = response.data.values || []
+    const existingRunIdRows = await spreadsheet.getColumn('C')
     const existingRunIDs = existingRunIdRows.map(row => row[0])
 
     runID = calculateUniqueRunID(eventId, existingRunIDs)
@@ -193,54 +283,33 @@ const updateMetric = async (
       runID,
       dryRun,
     ]
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: googleSheetId,
-      range: 'A1',
-      valueInputOption: 'USER_ENTERED',
-      resource: {
-        values: [values]
-      }
-    })
+    await spreadsheet.appendRow(values)
     insertedNewRow = true
   } else {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: 'B:C',
-    })
-    const fileNamesAndRunIDs = response.data.values || []
+    const fileNamesAndRunIDs = await spreadsheet.getColumns('B', 'C')
 
     let rowToUpdateIndex = fileNamesAndRunIDs.findIndex(row => row[0] === sourceFileName && row[1] === runID)
     if (rowToUpdateIndex === -1) {
       return { error: `No row found for File Name: ${sourceFileName} and Run ID: ${runID}` }
     }
 
-    const headers = await getHeaderRow(sheets, googleSheetId)
+    const headers = await spreadsheet.getRow(1)
     let colIndexForRecordType = headers.indexOf(recordType)
 
     if (colIndexForRecordType === -1) {
       warnings.push(`No column found for record type "${recordType}". Adding as a new column.`)
-      colIndexForRecordType = await addColumnFor(recordType, sheets, googleSheetId, headers)
+      colIndexForRecordType = await addColumnFor(recordType, spreadsheet, headers)
       insertedNewColumn = true
     }
 
     const rowNumber = rowToUpdateIndex + 1 // Row indexes start at 0. Row numbers start at 1.
     const columnLetterForRecordType = getColumnLetter(colIndexForRecordType)
-    const cellRange = `${columnLetterForRecordType}${rowNumber}`
+    const cellIdentifier = `${columnLetterForRecordType}${rowNumber}`
     
-    const getCellResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: googleSheetId,
-      range: cellRange,
-    })
-    previousCount = parseInt((getCellResponse.data.values || [[]])[0][0] || 0)
+    const previousCellValue = await spreadsheet.getCell(cellIdentifier)
+    previousCount = parseInt(previousCellValue || 0)
     newCount = previousCount + numberOfItems
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: googleSheetId,
-      range: cellRange,
-      valueInputOption: 'USER_ENTERED',
-      resource: {
-        values: [[newCount]]
-      }
-    })
+    await spreadsheet.update(cellIdentifier, [[newCount]])
   }
 
   return {
