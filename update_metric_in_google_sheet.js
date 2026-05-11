@@ -4,7 +4,7 @@ export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "2.0.2",
+  version: "2.0.3",
   type: "action",
 
   props: {
@@ -57,17 +57,24 @@ export default {
     }
   },
   async run() {
-    const googleSheet = new GoogleSheet(this.google_service_account_key, this.google_sheet_id)
+    try {
+      const googleSheet = new GoogleSheet(this.google_service_account_key, this.google_sheet_id)
 
-    return await updateMetric(
-      this.source_file_name,
-      this.run_id,
-      this.was_dry_run,
-      this.record_type,
-      this.number_of_items,
-      googleSheet,
-      this.event_id,
-    )
+      return await updateMetric(
+        this.source_file_name,
+        this.run_id,
+        this.was_dry_run,
+        this.record_type,
+        this.number_of_items,
+        googleSheet,
+        this.event_id,
+      )
+    } catch (error) {
+      return {
+        error: error.message || error,
+        stackTrace: error.stack,
+      }
+    }
   },
 }
 

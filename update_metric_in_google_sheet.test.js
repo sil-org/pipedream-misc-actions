@@ -306,6 +306,15 @@ describe(component.name, () => {
         component.number_of_items
       )
     })
+
+    it('should gracefully handle any Errors thrown', async () => {
+      component.google_service_account_key = 'NOT a valid JSON string, to trigger an error'
+
+      const response = await component.run()
+
+      console.debug(response)
+      assert.notEqual(response.error, undefined)
+    })
   })
 
   describe('calculateUniqueRunID', () => {
