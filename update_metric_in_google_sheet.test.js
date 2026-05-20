@@ -66,7 +66,7 @@ class MockSpreadsheet {
 }
 
 describe(component.name, () => {
-  describe('unit tests (using MockSpreadsheet)', () => {
+  describe('updateMetric', () => {
     it('should add a column if no column is found for that record type', async () => {
       const recordType = 'New Metric'
       const mockSheet = new MockSpreadsheet([
@@ -131,8 +131,8 @@ describe(component.name, () => {
 
     it('should return an error if no row has the given the File Name and Run ID', async () => {
       const mockSheet = new MockSpreadsheet([
-        ['Date', 'File Name', 'Run ID', 'Dry Run'],
-        ['2026-05-20', 'test.csv', 'abcd1234', 'No']
+        ['Date', 'File Name', 'Run ID', 'Dry Run', 'ICJE Lines'],
+        ['2026-05-20', 'test.csv', 'abcd1234', 'No', '']
       ])
       const response = await updateMetric(
         'test.csv',
@@ -289,29 +289,19 @@ describe(component.name, () => {
       assert.equal(response.newCount, 13)
       assert.equal(mockSheet.data[1][4], 13)
     })
-
-    it('should gracefully handle any Errors thrown', async () => {
-      // For updateMetric, it doesn't throw much itself, it returns errors.
-      // But we can test if it handles spreadsheet throwing.
-      const mockSheet = new MockSpreadsheet();
-      mockSheet.getColumn = () => { throw new Error('Simulated failure') };
-
-      const response = await updateMetric(
-        'test.csv',
-        'NEW',
-        false,
-        '',
-        1,
-        mockSheet,
-        'some-event-id'
-      ).catch(e => ({ error: e.message }));
-
-      assert.notEqual(response.error, undefined);
-    })
   })
 
-  describe('INTEGRATION: run (using real Google API)', () => {
-    it('should update the real Google Sheet', async (testContext) => {
+  describe('run', () => {
+    it('should gracefully handle any Errors thrown', async () => {
+      component.google_service_account_key = 'NOT a valid JSON string, to trigger an error'
+
+      const response = await component.run()
+
+      console.debug(response)
+      assert.notEqual(response.error, undefined)
+    })
+
+    it('should be able to update a real Google Sheet', async (testContext) => {
       const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
       const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
       if (!googleServiceAccountKey || !googleSheetId) {
