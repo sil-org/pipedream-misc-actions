@@ -19,28 +19,33 @@ const {
   calculateUniqueRunID,
 } = await import('./update_metric_in_google_sheet.js')
 
-class MockSpreadsheet {
-  constructor(initialData = [[]]) {
-    this.data = initialData; // 2D array: this.data[row][col]
-  }
+/**
+ * Mock spreadsheet adapter
+ *
+ * @constructor
+ * @param {Array[]} initialData
+ * @implements {SpreadsheetInterface}
+ */
+function MockSpreadsheet(initialData = [[]]) {
+  this.data = initialData; // 2D array: this.data[row][col]
 
-  async appendRow(cellValues) {
+  this.appendRow = async (cellValues) => {
     this.data.push(cellValues);
   }
 
-  async getCell(cellIdentifier) {
+  this.getCell = async (cellIdentifier) => {
     // Basic 'A1' notation parser for the mock
     const col = cellIdentifier.match(/[A-Z]+/)[0].charCodeAt(0) - 65;
     const row = parseInt(cellIdentifier.match(/\d+/)[0]) - 1;
     return (this.data[row] && this.data[row][col]) || '';
   }
 
-  async getColumn(columnLetter) {
+  this.getColumn = async (columnLetter) => {
     const colIndex = columnLetter.charCodeAt(0) - 65;
     return this.data.map(row => [row[colIndex]]);
   }
 
-  async getRanges(ranges) {
+  this.getRanges = async (ranges) => {
     return ranges.map(range => {
       if (range === '1:1') return [this.data[0]];
       if (range === 'B:C') return this.data.map(row => [row[1], row[2]]);
@@ -48,7 +53,7 @@ class MockSpreadsheet {
     });
   }
 
-  async update(range, values) {
+  this.update = async (range, values) => {
     if (range === '1:1') {
       this.data[0] = values[0];
     } else {
