@@ -134,7 +134,7 @@ describe(component.name, () => {
       )
     })
 
-    it('should return an error if no row has the given the File Name and Run ID', async () => {
+    it('should return an error if no row has the given File Name and Run ID', async () => {
       const mockSheet = new MockSpreadsheet([
         ['Date', 'File Name', 'Run ID', 'Dry Run', 'ICJE Lines'],
         ['2026-05-20', 'test.csv', 'abcd1234', 'No', '']
