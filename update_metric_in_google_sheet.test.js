@@ -15,33 +15,79 @@ try {
 
 const {
   default: component,
+  updateMetric,
   calculateUniqueRunID,
 } = await import('./update_metric_in_google_sheet.js')
 
-describe(component.name, () => {
-  describe('run', () => {
-    it('should add a column if no column is found for that record type', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
+/**
+ * Mock spreadsheet adapter
+ *
+ * @constructor
+ * @param {Array[]} initialData
+ * @implements {SpreadsheetInterface}
+ */
+function MockSpreadsheet(initialData = [[]]) {
+  this.data = initialData; // 2D array: this.data[row][col]
+
+  this.appendRow = async (cellValues) => {
+    this.data.push(cellValues);
+  }
+
+  this.getCell = async (cellIdentifier) => {
+    // Basic 'A1' notation parser for the mock
+    const col = cellIdentifier.match(/[A-Z]+/)[0].charCodeAt(0) - 65;
+    const row = parseInt(cellIdentifier.match(/\d+/)[0]) - 1;
+    return (this.data[row] && this.data[row][col]) || '';
+  }
+
+  this.getColumn = async (columnLetter) => {
+    const colIndex = columnLetter.charCodeAt(0) - 65;
+    return this.data.map(row => [row[colIndex]]);
+  }
+
+  this.getRanges = async (ranges) => {
+    return ranges.map(range => {
+      if (range === '1:1') return [this.data[0]];
+      if (range === 'B:C') return this.data.map(row => [row[1], row[2]]);
+      return [];
+    });
+  }
+
+  this.update = async (range, values) => {
+    if (range === '1:1') {
+      this.data[0] = values[0];
+    } else {
+      const col = range.match(/[A-Z]+/)[0].charCodeAt(0) - 65;
+      const row = parseInt(range.match(/\d+/)[0]) - 1;
+      if (!this.data[row]) {
+        // Fill rows if they don't exist
+        for (let i = this.data.length; i <= row; i++) {
+          this.data[i] = [];
+        }
       }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+      this.data[row][col] = values[0][0];
+    }
+  }
+}
 
-      component.run_id = 'abcd1234'
-      component.source_file_name = 'test.csv'
-      component.record_type = Math.random() + ' Lines'
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
+describe(component.name, () => {
+  describe('updateMetric', () => {
+    it('should add a column if no column is found for that record type', async () => {
+      const recordType = 'New Metric'
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run'], // Headers
+        ['2026-05-20', 'test.csv', 'abcd1234', 'No'] // Existing Row
+      ]);
 
-      const response = await component.run({
-        steps: { trigger: {} },
-        $: {}
-      })
+      const response = await updateMetric(
+        'test.csv',
+        'abcd1234',
+        false,
+        recordType,
+        1,
+        mockSheet
+      );
 
-      console.debug(response)
       assert.equal(response.error, undefined)
       assert.ok(
         String(response.warnings?.join("\n")).includes('No column found for'),
@@ -49,58 +95,38 @@ describe(component.name, () => {
       )
       assert.ok(response.insertedNewColumn)
       assert.equal(response.newCount, 1)
+      assert.equal(mockSheet.data[0][4], recordType)
+      assert.equal(mockSheet.data[1][4], 1)
     })
 
-    it('should report an error if not given a Run ID (nor told to generate a new one)', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should report an error if not given a Run ID (nor told to generate a new one)', async () => {
+      const mockSheet = new MockSpreadsheet()
+      const response = await updateMetric(
+        'test.csv',
+        '', // runID
+        false,
+        'ICJEs',
+        1,
+        mockSheet
+      )
 
-      component.run_id = ''
-      component.source_file_name = 'test.csv'
-      component.record_type = 'ICJEs'
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-
-      const response = await component.run({
-        steps: { trigger: {} },
-        $: {}
-      })
-
-      console.debug(response)
       assert.ok(
         String(response.error).includes('Run ID'),
         'Expected an error about the Run ID'
       )
     })
 
-    it('should report an error if given a Record Type when generating a new row', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should report an error if given a Record Type when generating a new row', async () => {
+      const mockSheet = new MockSpreadsheet()
+      const response = await updateMetric(
+        'test.csv',
+        'NEW',
+        false,
+        'ICJE Lines',
+        1,
+        mockSheet
+      )
 
-      component.run_id = 'NEW'
-      component.source_file_name = 'test.csv'
-      component.record_type = 'ICJE Lines'
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-
-      const response = await component.run({
-        steps: { trigger: {} },
-        $: {}
-      })
-
-      console.debug(response)
       const errorMessage = String(response.error)
       assert.ok(
         errorMessage.includes('Record Type') && errorMessage.includes('new'),
@@ -108,205 +134,169 @@ describe(component.name, () => {
       )
     })
 
-    it('should return an error if no row has the given the File Name and Run ID', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should return an error if no row has the given File Name and Run ID', async () => {
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run', 'ICJE Lines'],
+        ['2026-05-20', 'test.csv', 'abcd1234', 'No', '']
+      ])
+      const response = await updateMetric(
+        'test.csv',
+        'zzzzzzzz',
+        false,
+        'ICJE Lines',
+        1,
+        mockSheet
+      )
 
-      component.run_id = 'zzzzzzzz'
-      component.source_file_name = 'test.csv'
-      component.record_type = 'ICJE Lines'
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-
-      const response = await component.run({
-        steps: { trigger: {} },
-        $: {}
-      })
-
-      console.debug(response)
       assert.ok(
         String(response.error).includes('No row found for'),
         'Expected an error that no row was found for that run id'
       )
     })
 
-    it('should add a row (and use the Event ID as the actual Run ID) if given a Run ID of "NEW"', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should add a row (and use the Event ID as the actual Run ID) if given a Run ID of "NEW"', async () => {
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run']
+      ])
       const exampleEventId = randomUUID()
 
-      component.run_id = 'NEW'
-      component.source_file_name = 'test.csv'
-      component.record_type = ''
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-      component.event_id = exampleEventId
+      const response = await updateMetric(
+        'test.csv',
+        'NEW',
+        false,
+        '',
+        1,
+        mockSheet,
+        exampleEventId
+      )
 
-      const response = await component.run()
-
-      console.debug(response)
       assert.equal(response.error, undefined)
       assert.ok(response.insertedNewRow)
       assert.equal(response.runID, exampleEventId)
       assert.notEqual(response.runID, 'NEW')
       assert.equal(response.newCount, undefined)
+      assert.equal(mockSheet.data.length, 2)
+      assert.equal(mockSheet.data[1][1], 'test.csv')
+      assert.equal(mockSheet.data[1][2], exampleEventId)
     })
 
-    it('should indicate that it was a dry run (when adding a new row during a dry run)', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should indicate that it was a dry run (when adding a new row during a dry run)', async () => {
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run']
+      ])
       const exampleEventId = randomUUID()
 
-      component.run_id = 'NEW'
-      component.was_dry_run = true
-      component.source_file_name = 'test.csv'
-      component.record_type = ''
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-      component.event_id = exampleEventId
+      const response = await updateMetric(
+        'test.csv',
+        'NEW',
+        true,
+        '',
+        1,
+        mockSheet,
+        exampleEventId
+      )
 
-      const response = await component.run()
-
-      console.debug(response)
       assert.equal(response.error, undefined)
       assert.ok(response.insertedNewRow)
       assert.equal(response.dryRun, 'Yes')
+      assert.equal(mockSheet.data[1][3], 'Yes')
     })
 
-    it('should indicate that it was not a dry run (when adding a new row during a non-dry-run)', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should indicate that it was not a dry run (when adding a new row during a non-dry-run)', async () => {
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run']
+      ])
       const exampleEventId = randomUUID()
 
-      component.run_id = 'NEW'
-      component.was_dry_run = false
-      component.source_file_name = 'test.csv'
-      component.record_type = ''
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-      component.event_id = exampleEventId
+      const response = await updateMetric(
+        'test.csv',
+        'NEW',
+        false,
+        '',
+        1,
+        mockSheet,
+        exampleEventId
+      )
 
-      const response = await component.run()
-
-      console.debug(response)
       assert.equal(response.error, undefined)
       assert.ok(response.insertedNewRow)
       assert.equal(response.dryRun, 'No')
+      assert.equal(mockSheet.data[1][3], 'No')
     })
 
-    it('should add a row and calculate a unique Run ID if given an existing Run ID when adding a row', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should add a row and calculate a unique Run ID if given an existing Run ID when adding a row', async () => {
       const existingEventId = 'abcd1234'
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run'],
+        ['2026-05-20', 'test.csv', existingEventId, 'No']
+      ])
 
-      component.run_id = 'NEW'
-      component.source_file_name = 'test.csv'
-      component.record_type = ''
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-      component.event_id = existingEventId
+      const response = await updateMetric(
+        'test.csv',
+        'NEW',
+        false,
+        '',
+        1,
+        mockSheet,
+        existingEventId
+      )
 
-      const response = await component.run()
-
-      console.debug(response)
       assert.equal(response.error, undefined)
       assert.ok(response.insertedNewRow)
       assert.ok(response.runID.startsWith(existingEventId))
       assert.notEqual(response.runID, existingEventId)
       assert.notEqual(response.runID, 'NEW')
-      assert.equal(response.newCount, undefined)
+      assert.equal(mockSheet.data.length, 3)
+      assert.equal(mockSheet.data[2][2], response.runID)
     })
 
-    it('should update the existing row if one matches the File Name and Run ID', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
+    it('should update the existing row if one matches the File Name and Run ID', async () => {
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run', 'ICJE Lines'],
+        ['2026-05-20', 'test.csv', 'abcd1234', 'No', '5']
+      ])
 
-      component.run_id = 'abcd1234'
-      component.source_file_name = 'test.csv'
-      component.record_type = 'ICJE Lines'
-      component.number_of_items = 1
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-
-      const response = await component.run({
-        steps: { trigger: {} },
-        $: {}
-      })
-
-      console.debug(response)
-      assert.equal(response.error, undefined)
-      assert.equal(response.insertedNewRow, false)
-      assert.equal(response.runID, component.run_id)
-      assert.ok(response.newCount > 0)
-    })
-
-    it('should update by the specified amount', async (testContext) => {
-      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
-      if (!googleServiceAccountKey) {
-        testContext.skip('Lacking GOOGLE_SERVICE_ACCOUNT_KEY, skipping test')
-        return
-      }
-      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
-      assert.ok(googleSheetId, 'No GOOGLE_SHEET_ID provided')
-
-      component.run_id = 'abcd1234'
-      component.source_file_name = 'test.csv'
-      component.record_type = 'Invoice Lines'
-      component.number_of_items = 3
-      component.google_sheet_id = googleSheetId
-      component.google_service_account_key = googleServiceAccountKey
-
-      const response = await component.run({
-        steps: { trigger: {} },
-        $: {}
-      })
-
-      console.debug(response)
-      assert.equal(response.error, undefined)
-      assert.equal(response.insertedNewRow, false)
-      assert.equal(response.runID, component.run_id)
-      assert.notEqual(response.previousCount, undefined, 'Did not return previous count')
-      assert.equal(
-        response.newCount - response.previousCount,
-        component.number_of_items
+      const response = await updateMetric(
+        'test.csv',
+        'abcd1234',
+        false,
+        'ICJE Lines',
+        1,
+        mockSheet
       )
+
+      assert.equal(response.error, undefined)
+      assert.equal(response.insertedNewRow, false)
+      assert.equal(response.runID, 'abcd1234')
+      assert.equal(response.previousCount, 5)
+      assert.equal(response.newCount, 6)
+      assert.equal(mockSheet.data[1][4], 6)
     })
 
+    it('should update by the specified amount', async () => {
+      const mockSheet = new MockSpreadsheet([
+        ['Date', 'File Name', 'Run ID', 'Dry Run', 'Invoice Lines'],
+        ['2026-05-20', 'test.csv', 'abcd1234', 'No', '10']
+      ])
+
+      const response = await updateMetric(
+        'test.csv',
+        'abcd1234',
+        false,
+        'Invoice Lines',
+        3,
+        mockSheet
+      )
+
+      assert.equal(response.error, undefined)
+      assert.equal(response.insertedNewRow, false)
+      assert.equal(response.previousCount, 10)
+      assert.equal(response.newCount, 13)
+      assert.equal(mockSheet.data[1][4], 13)
+    })
+  })
+
+  describe('run', () => {
     it('should gracefully handle any Errors thrown', async () => {
       component.google_service_account_key = 'NOT a valid JSON string, to trigger an error'
 
@@ -314,6 +304,26 @@ describe(component.name, () => {
 
       console.debug(response)
       assert.notEqual(response.error, undefined)
+    })
+
+    it('should be able to update a real Google Sheet', async (testContext) => {
+      const googleServiceAccountKey = process.env.TEST_GOOGLE_SERVICE_ACCOUNT_KEY
+      const googleSheetId = process.env.TEST_GOOGLE_SHEET_ID
+      if (!googleServiceAccountKey || !googleSheetId) {
+        testContext.skip('Missing credentials for integration test')
+        return
+      }
+
+      component.run_id = 'abcd1234'
+      component.source_file_name = 'test.csv'
+      component.record_type = 'Invoice Lines'
+      component.number_of_items = 1
+      component.google_sheet_id = googleSheetId
+      component.google_service_account_key = googleServiceAccountKey
+
+      const response = await component.run()
+      assert.equal(response.error, undefined)
+      assert.ok(response.newCount > response.previousCount)
     })
   })
 
