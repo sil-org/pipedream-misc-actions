@@ -2,7 +2,7 @@ export default defineComponent({
   name: "Fetch Record from Data Store",
   description: "Fetch Record from Data Store (DEV or PROD, as appropriate)",
   key: "fetch_datastore_record",
-  version: "0.1.0",
+  version: "0.1.1",
   type: "action",
   
   props: {
@@ -23,7 +23,7 @@ export default defineComponent({
   },
 
   async run({ steps, $ }) {
-    const MAX_DURATION_MS = 100000
+    const MAX_DURATION_MS = 10000
     const start = Date.now()
     let attempt = 0
     const dataQueue = this.isProd ? this.prodDataQueue : this.devDataQueue
@@ -57,12 +57,11 @@ export default defineComponent({
         console.log(`Attempt ${i+1} failed:`, err.message);
 
         if (elapsed > MAX_DURATION_MS){
-          throw new Error("Datastore unavailable after 10s of retrying")
+          throw new Error(`Datastore unavailable after ${MAX_DURATION_MS / 1000}s of retrying`)
         }
 
         const delay = Math.min(1000 * attempt, 3000)
         await new Promise(r=>setTimeout(r, delay))
-
       }
     }
   },
