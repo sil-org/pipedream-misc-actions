@@ -3,8 +3,8 @@ import { describe, it } from 'node:test'
 
 const { default: component } = await import('./send_email.js')
 
-describe.only(component.name, () => {
-  it.only('should be able to send an email without an attachment', async (testContext) => {
+describe(component.name, () => {
+  it('should be able to send an email without an attachment', async (testContext) => {
     const accessKeyId = process.env.AWS_ACCESS_KEY_ID
     if (!accessKeyId) {
       testContext.skip('No `AWS_ACCESS_KEY_ID` env. var. provided, skipping email test')
@@ -46,7 +46,7 @@ describe.only(component.name, () => {
     assert.ok(response.messageId, 'No messageId was returned')
   })
 
-  it.only('should be able to send an email with an attachment', async (testContext) => {
+  it('should be able to send an email with an attachment', async (testContext) => {
     const accessKeyId = process.env.AWS_ACCESS_KEY_ID
     if (!accessKeyId) {
       testContext.skip('No `AWS_ACCESS_KEY_ID` env. var. provided, skipping email test')
@@ -94,7 +94,7 @@ describe.only(component.name, () => {
     assert.ok(response.messageId, 'No messageId was returned')
   })
 
-  it.only('should be able to send an email with two attachments', async (testContext) => {
+  it('should be able to send an email with two attachments', async (testContext) => {
     const accessKeyId = process.env.AWS_ACCESS_KEY_ID
     if (!accessKeyId) {
       testContext.skip('No `AWS_ACCESS_KEY_ID` env. var. provided, skipping email test')
