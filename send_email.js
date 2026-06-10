@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer"
-import sesClientModule from '@aws-sdk/client-ses'
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2"
 
 export default {
   name: "Send Email",
@@ -69,28 +69,46 @@ export default {
 
     const { accessKeyId, secretAccessKey } = this.amazon_ses.$auth
 
-    const ses = new sesClientModule.SESClient({
-      accessKeyId,
-      secretAccessKey,
-      region: 'us-east-1',
+    const sesClient = new SESv2Client({
+      region: "us-east-1",
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
     })
 
     const transporter = nodemailer.createTransport({
-      SES: { ses, aws: sesClientModule },
+      SES: { sesClient, SendEmailCommand },
     })
 
-    return await transporter.sendMail({
-        from: this.from,
-        to: this.to,
-        subject: this.subject,
-        text: this.body,
-        attachments: [{
-          content: this.attachmentContent,
-          encoding: this.attachmentEncoding,
-          filename: this.attachmentFilename,
-          contentType: this.attachmentType,
-        }],
-      },
-    )
+    const mail = {
+      from: this.from,
+      to: this.to,
+      subject: this.subject,
+      text: this.body,
+    }
+
+    const contents = Array.isArray(this.attachmentContent) ? this.attachmentContent : []
+    const filenames = Array.isArray(this.attachmentFilename) ? this.attachmentFilename : []
+    const types = Array.isArray(this.attachmentType) ? this.attachmentType : []
+    const encoding = this.attachmentEncoding?.toLowerCase()
+
+    // Map first to preserve index alignment, then filter out empty/missing entries.
+    const attachments = contents
+      .map((content, i) => ({
+        content,
+        ...(filenames[i] && { filename: filenames[i] }),
+        ...(types[i] && { contentType: types[i] }),
+        ...(encoding && { encoding }),
+      }))
+      .filter(({ content }) => content != null && content !== "")
+
+    if (attachments.length > 0) {
+      mail.attachments = attachments
+    }
+
+    const response = await transporter.sendMail(mail)
+
+    return response
   },
 }
