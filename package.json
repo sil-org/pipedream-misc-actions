@@ -1,8 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "test": "node --env-file=.env --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test",
-    "test-only": "node --env-file=.env --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test --test-only"
+    "test": "node --env-file-if-exists=.env --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test",
+    "test-only": "node --env-file-if-exists=.env --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.mjs\", pathToFileURL(\"./\"));' --test --test-only"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1065.0",
