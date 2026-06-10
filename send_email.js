@@ -1,10 +1,11 @@
-import AWS from 'aws-sdk@^2'
+import nodemailer from "nodemailer"
+import sesClientModule from '@aws-sdk/client-ses'
 
 export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
-  version: "0.1.3",
+  version: "1.0.0",
   type: "action",
 
   props: {
@@ -68,47 +69,28 @@ export default {
 
     const { accessKeyId, secretAccessKey } = this.amazon_ses.$auth
 
-    const ses = new AWS.SES({
+    const ses = new sesClientModule.SESClient({
       accessKeyId,
       secretAccessKey,
       region: 'us-east-1',
     })
 
-    const boundary = "----=_Part_123456"
+    const transporter = nodemailer.createTransport({
+      SES: { ses, aws: sesClientModule },
+    })
 
-    const emailArray = [
-      `From: ${this.from}`,
-      `To: ${this.to}`,
-      "Subject: " + this.subject,
-      "MIME-Version: 1.0",
-      `Content-Type: multipart/mixed; boundary="${boundary}"`,
-      "",
-      `--${boundary}`,
-      "Content-Type: text/plain; charset=UTF-8",
-      "",
-      this.body,
-      "",
-      `--${boundary}`,
-    ]
-
-    const rawEmail = emailArray.concat(this.attachmentContent.flatMap((content, i) => {
-      return [
-        `Content-Type: ${this.attachmentType[i]}; charset=UTF-8`,
-        `Content-Disposition: attachment; filename="${this.attachmentFilename[i]}"`,
-        `Content-Transfer-Encoding: ${this.attachmentEncoding || "base64"}`,
-        "",
-        content,
-        "",
-        `--${boundary}--`,
-      ]
-    })).join("\n")
-
-    const params = {
-      RawMessage: { Data: Buffer.from(rawEmail) },
-    }
-
-    const result = await ses.sendRawEmail(params).promise()
-
-    return result
+    return await transporter.sendMail({
+        from: this.from,
+        to: this.to,
+        subject: this.subject,
+        text: this.body,
+        attachments: [{
+          content: this.attachmentContent,
+          encoding: this.attachmentEncoding,
+          filename: this.attachmentFilename,
+          contentType: this.attachmentType,
+        }],
+      },
+    )
   },
 }
