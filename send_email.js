@@ -1,10 +1,11 @@
-import AWS from 'aws-sdk@^2'
+import nodemailer from "nodemailer"
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2"
 
 export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
-  version: "0.1.3",
+  version: "1.0.0",
   type: "action",
 
   props: {
@@ -68,47 +69,46 @@ export default {
 
     const { accessKeyId, secretAccessKey } = this.amazon_ses.$auth
 
-    const ses = new AWS.SES({
-      accessKeyId,
-      secretAccessKey,
-      region: 'us-east-1',
+    const sesClient = new SESv2Client({
+      region: "us-east-1",
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
     })
 
-    const boundary = "----=_Part_123456"
+    const transporter = nodemailer.createTransport({
+      SES: { sesClient, SendEmailCommand },
+    })
 
-    const emailArray = [
-      `From: ${this.from}`,
-      `To: ${this.to}`,
-      "Subject: " + this.subject,
-      "MIME-Version: 1.0",
-      `Content-Type: multipart/mixed; boundary="${boundary}"`,
-      "",
-      `--${boundary}`,
-      "Content-Type: text/plain; charset=UTF-8",
-      "",
-      this.body,
-      "",
-      `--${boundary}`,
-    ]
-
-    const rawEmail = emailArray.concat(this.attachmentContent.flatMap((content, i) => {
-      return [
-        `Content-Type: ${this.attachmentType[i]}; charset=UTF-8`,
-        `Content-Disposition: attachment; filename="${this.attachmentFilename[i]}"`,
-        `Content-Transfer-Encoding: ${this.attachmentEncoding || "base64"}`,
-        "",
-        content,
-        "",
-        `--${boundary}--`,
-      ]
-    })).join("\n")
-
-    const params = {
-      RawMessage: { Data: Buffer.from(rawEmail) },
+    const mail = {
+      from: this.from,
+      to: this.to,
+      subject: this.subject,
+      text: this.body,
     }
 
-    const result = await ses.sendRawEmail(params).promise()
+    const contents = Array.isArray(this.attachmentContent) ? this.attachmentContent : []
+    const filenames = Array.isArray(this.attachmentFilename) ? this.attachmentFilename : []
+    const types = Array.isArray(this.attachmentType) ? this.attachmentType : []
+    const encoding = this.attachmentEncoding?.toLowerCase()
 
-    return result
+    // Map first to preserve index alignment, then filter out empty/missing entries.
+    const attachments = contents
+      .map((content, i) => ({
+        content,
+        ...(filenames[i] && { filename: filenames[i] }),
+        ...(types[i] && { contentType: types[i] }),
+        ...(encoding && { encoding }),
+      }))
+      .filter(({ content }) => content != null && content !== "")
+
+    if (attachments.length > 0) {
+      mail.attachments = attachments
+    }
+
+    const response = await transporter.sendMail(mail)
+
+    return response
   },
 }
