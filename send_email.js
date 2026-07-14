@@ -1,11 +1,11 @@
-import nodemailer from "nodemailer"
+import nodemailer from "nodemailer@^9.0.1"
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2"
 
 export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
-  version: "1.0.0",
+  version: "1.0.1",
   type: "action",
 
   props: {
