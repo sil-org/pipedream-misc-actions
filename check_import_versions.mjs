@@ -1,29 +1,14 @@
 import { readFileSync, readdirSync, statSync } from 'fs';
-import { join } from 'path';
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const deps = pkg.dependencies || {};
 
-const EXCLUDE = new Set(['node_modules', '.git', 'dist', '.cache']);
 const IMPORT_RE = /^\s*import\s+.*\bfrom\s+['"]([^'"]+)['"]/gm;
 
-function jsFilesAtDepth(dir, depth) {
-  if (depth === 0) return [];
-  const files = [];
-  for (const entry of readdirSync(dir)) {
-    if (EXCLUDE.has(entry)) continue;
-    const full = join(dir, entry);
-    const stat = statSync(full);
-    if (stat.isDirectory()) {
-      files.push(...jsFilesAtDepth(full, depth - 1));
-    } else if (stat.isFile() && entry.endsWith('.js')) {
-      files.push(full);
-    }
-  }
-  return files;
-}
+const files = readdirSync('.')
+  .filter(entry => entry.endsWith('.js') && !entry.endsWith('.test.js'))
+  .filter(entry => statSync(entry).isFile());
 
-const files = jsFilesAtDepth('.', 2);
 const mismatches = [];
 
 for (const file of files) {
