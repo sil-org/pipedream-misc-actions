@@ -12,39 +12,41 @@ const files = readdirSync('.')
 const mismatches = [];
 
 for (const file of files) {
-  const src = readFileSync(file, 'utf8');
-  let m;
+  const source = readFileSync(file, 'utf8');
+  let match;
   IMPORT_RE.lastIndex = 0;
-  while ((m = IMPORT_RE.exec(src)) !== null) {
-    const spec = m[1];
+  while ((match = IMPORT_RE.exec(source)) !== null) {
+    const importSpecifier = match[1];
     // Parse package name and version from import specifier.
     // Scoped packages: @scope/name[@version]
     // Unscoped packages: name[@version]
     let pkgName, version;
-    if (spec.startsWith('@')) {
-      const parts = spec.slice(1).split('@');
-      pkgName = '@' + parts[0];
-      version = parts[1];
+    if (importSpecifier.startsWith('@')) {
+      const scopedParts = importSpecifier.slice(1).split('@');
+      pkgName = '@' + scopedParts[0];
+      version = scopedParts[1];
     } else {
-      const idx = spec.indexOf('@');
-      pkgName = idx === -1 ? spec : spec.slice(0, idx);
-      version = idx === -1 ? undefined : spec.slice(idx + 1);
+      const idx = importSpecifier.indexOf('@');
+      pkgName = idx === -1 ? importSpecifier : importSpecifier.slice(0, idx);
+      version = idx === -1 ? undefined : importSpecifier.slice(idx + 1);
     }
 
     if (!(pkgName in deps)) continue; // Not a tracked dependency; skip.
 
     const expected = deps[pkgName];
     if (!version) {
-      mismatches.push(`${file}: '${spec}' has no version constraint (expected @${expected})`);
+      mismatches.push(`${file}: '${importSpecifier}' has no version constraint (expected @${expected})`);
     } else if (version !== expected) {
-      mismatches.push(`${file}: '${spec}' has version @${version} but package.json requires @${expected}`);
+      mismatches.push(`${file}: '${importSpecifier}' has version @${version} but package.json requires @${expected}`);
     }
   }
 }
 
 if (mismatches.length > 0) {
   console.error('Import version mismatches found:');
-  for (const msg of mismatches) console.error(' -', msg);
+  for (const mismatch of mismatches) {
+    console.error(' -', mismatch);
+  }
   process.exit(1);
 } else {
   console.log('All import version constraints match package.json.');
