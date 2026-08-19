@@ -1,4 +1,4 @@
-import alasql from 'alasql@^4'
+import alasql from 'alasql@4.10.0'
 
 export default {
   name: "SQL Query Data",

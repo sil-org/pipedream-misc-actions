@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer@^9.0.1"
-import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2"
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2@^3.1065.0"
 
 export default {
   name: "Send Email",
