@@ -1,4 +1,4 @@
-import Client from 'ssh2-sftp-client@^12.0.1'
+import Client from 'ssh2-sftp-client@^12'
 
 /**
  * Walks a directory on the remote SFTP server and returns a list of files. Returns an object with filenames as keys

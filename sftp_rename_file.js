@@ -1,4 +1,4 @@
-import Client from "ssh2-sftp-client@^12.0.1";
+import Client from "ssh2-sftp-client@^12";
 
 export default defineComponent({
   name: "Rename SFTP File",
