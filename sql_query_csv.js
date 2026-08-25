@@ -1,4 +1,4 @@
-import alasql from 'alasql@4.10.0'
+import alasql from 'alasql@^4'
 import Papa from 'papaparse@^5'
 
 export default defineComponent({
