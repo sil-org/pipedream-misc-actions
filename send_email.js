@@ -5,7 +5,7 @@ export default {
   name: "Send Email",
   description: "Send an email, with or without an attachment",
   key: "send_email",
-  version: "1.0.1",
+  version: "1.0.2",
   type: "action",
 
   props: {
