@@ -1,4 +1,5 @@
 import { readFileSync, readdirSync, statSync } from 'fs';
+import { isBuiltin } from 'node:module';
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const deps = pkg.dependencies || {};
@@ -32,7 +33,9 @@ for (const file of files) {
     }
 
     if (!(pkgName in deps)) {
-      console.warn(`Warning: ${file}: '${importSpecifier}' is not a dependency in package.json`);
+      if (!isBuiltin(pkgName)) {
+        mismatches.push(`${file}: Please run 'npm install "${pkgName}"' to add that dependency to package.json`);
+      }
       continue;
     }
 
