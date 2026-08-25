@@ -1,4 +1,4 @@
-import { axios } from '@pipedream/platform';
+import { axios } from '@pipedream/platform@^3';
 
 export default defineComponent({
   name: "Foreach",
