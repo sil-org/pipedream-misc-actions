@@ -31,7 +31,10 @@ for (const file of files) {
       version = idx === -1 ? undefined : importSpecifier.slice(idx + 1);
     }
 
-    if (!(pkgName in deps)) continue; // Not a tracked dependency; skip.
+    if (!(pkgName in deps)) {
+      console.warn(`Warning: ${file}: '${importSpecifier}' is not a dependency in package.json`);
+      continue;
+    }
 
     const expected = deps[pkgName];
     if (!version) {
