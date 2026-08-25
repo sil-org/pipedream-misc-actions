@@ -34,7 +34,7 @@ for (const file of files) {
 
     if (!(pkgName in deps)) {
       if (!isBuiltin(pkgName)) {
-        mismatches.push(`${file}: Please run 'npm install "${pkgName}"' to add that dependency to package.json`);
+        mismatches.push(`${file}: Please run 'npm install "${importSpecifier}"' to add that dependency to package.json`);
       }
       continue;
     }
@@ -43,7 +43,7 @@ for (const file of files) {
     if (!version) {
       mismatches.push(`${file}: '${importSpecifier}' has no version constraint (expected @${expected})`);
     } else if (version !== expected) {
-      mismatches.push(`${file}: '${importSpecifier}' has version @${version} but package.json requires @${expected}`);
+      mismatches.push(`${file}: '${importSpecifier}' has version @${version} but package.json uses @${expected}`);
     }
   }
 }
