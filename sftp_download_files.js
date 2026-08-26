@@ -1,4 +1,4 @@
-import Client from 'ssh2-sftp-client@^12.0.1'
+import Client from 'ssh2-sftp-client@^12'
 
 /**
  * Walks a directory on the remote SFTP server and returns a list of files. Returns an object with filenames as keys
@@ -28,7 +28,7 @@ export default {
   description: 'Downloads all files from a directory on an SFTP host. Returns an object with filenames ' +
     'as keys and content as values.',
   key: 'sftp_download_files',
-  version: '0.0.1',
+  version: '0.0.2',
   type: 'action',
 
   props: {

@@ -1,10 +1,10 @@
-import alasql from 'alasql@^4'
+import alasql from 'alasql@4.10.0'
 
 export default {
   name: "SQL Query Data",
   description: "Use a SQL query to get data from the given sets of data",
   key: "sql_query_data",
-  version: "0.1.1",
+  version: "0.1.2",
   type: "action",
 
   props: {

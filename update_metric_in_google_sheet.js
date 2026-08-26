@@ -1,10 +1,10 @@
-import { google } from 'googleapis@^172'
+import { google } from 'googleapis@^172.0.0'
 
 export default {
   name: "Update Metric (Google Sheet)",
   description: "Add a new row OR increment the counter for how many records of a given type were processed, in a Google Sheet",
   key: "update_metric_in_google_sheet",
-  version: "2.0.4",
+  version: "2.0.5",
   type: "action",
 
   props: {

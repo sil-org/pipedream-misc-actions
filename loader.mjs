@@ -1,6 +1,6 @@
 export async function resolve(specifier, context, defaultResolve) {
   // ---- MOCK @pipedream/platform ----
-  if (specifier === "@pipedream/platform") {
+  if (String(specifier).startsWith("@pipedream/platform")) {
     return {
       url:
         "data:text/javascript," +
