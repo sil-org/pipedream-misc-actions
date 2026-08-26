@@ -4,7 +4,7 @@ export default {
   name: "SQL Query Data",
   description: "Use a SQL query to get data from the given sets of data",
   key: "sql_query_data",
-  version: "0.1.2",
+  version: "0.1.3",
   type: "action",
 
   props: {
