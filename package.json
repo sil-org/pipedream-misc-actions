@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1166.0",
-    "@pipedream/platform": "^3",
+    "@pipedream/platform": "^3.4.0",
     "alasql": "^4",
     "csv-writer": "^1.6.0",
     "googleapis": "^172.0.0",

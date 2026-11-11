@@ -1,10 +1,10 @@
-import { axios } from '@pipedream/platform@^3';
+import { axios } from '@pipedream/platform@^3.4.0';
 
 export default defineComponent({
   name: "Foreach",
   description: "Runs a sub-workflow for each value of an array",
   key: "foreach",
-  version: "0.1.1",
+  version: "0.1.3",
   type: "action",
 
   props: {

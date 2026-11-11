@@ -1,10 +1,10 @@
-import { axios } from "@pipedream/platform@^3";
+import { axios } from "@pipedream/platform@^3.4.0";
 export default {
   name: "Retrigger Workflow",
   description:
     "Start a recursive call to the same workflow, passing in the datastore that will be used to determine whether another call is needed.",
   key: "retrigger_workflow",
-  version: "1.0.2",
+  version: "1.0.3",
   type: "action",
 
   props: {
